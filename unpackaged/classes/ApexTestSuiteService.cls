@@ -35,19 +35,13 @@ public with sharing class ApexTestSuiteService {
 			return null;
 		}
 
-		final Set<Id> apexClassIdSet = new Set<Id>();
-		for (TestSuiteMembership member: memberList) {
-			apexClassIdSet.add(member.ApexClassId);
-		}
+		final ApexTestQueueItem[] queueItems = createApexTestQueueItem(memberList);
 
-		final ApexTestQueueItem[] queueItems = new List<ApexTestQueueItem>();
-		for (Id apexClassId : apexClassIdSet) {
-			queueItems.add(new ApexTestQueueItem(ApexClassId=apexClassId));
-		}
 		if(queueItems.isEmpty()) {
 			System.debug('Not found membership apexTestSuite: ' + apexTestSuite.TestSuiteName);
 			return null;
 		}
+
 		INSERT queueItems;
 
 		// Get the job ID of the first queue item returned.
@@ -57,6 +51,23 @@ public with sharing class ApexTestSuiteService {
 				LIMIT 1
 		];
 		return item.ParentJobId;
+	}
+
+	public static Set<Id> createSetId(List<TestSuiteMembership> memberList) {
+		final Set<Id> idSet = new Set<Id>();
+		for (TestSuiteMembership member: memberList) {
+			idSet.add(member.ApexClassId);
+		}
+		return idSet;
+	}
+
+	public static List<ApexTestQueueItem> createApexTestQueueItem(List<TestSuiteMembership> memberList) {
+		final Set<Id> apexClassIdSet = createSetId(memberList);
+		final ApexTestQueueItem[] queueItems = new List<ApexTestQueueItem>();
+		for (Id apexClassId : apexClassIdSet) {
+			queueItems.add(new ApexTestQueueItem(ApexClassId=apexClassId));
+		}
+		return queueItems;
 	}
 
 	public List<ApexTestSuite> findApexTestSuite() {

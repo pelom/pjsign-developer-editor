@@ -9,7 +9,7 @@
             <div class="slds-grid">
 
                 <div aura:id="nav-menu"
-                     class="stage-left slds-grid slds-size--2-of-12  slds-theme--info slds-p-vertical--x-small slds-p-horizontal--medium">
+                     class="stage-left slds-grid slds-size--2-of-12 slds-theme--alt-inverse slds-p-vertical--x-small slds-p-horizontal--medium">
                     <span class="slds-icon__container slds-align-middle">
                       <img onclick="{!c.toggle}" class="slds-icon slds-icon--small cursor-point"
                            src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/8005/rows.svg" alt="Toggle Menu" />
@@ -270,7 +270,7 @@
                 </div>
             </nav>
 
-            {!v.body}
+            <div class="stage-container slds-grid slds-nowrap">{!v.body}</div>
 
             <div aura:id="spinner" class="slds-spinner_container toggle">
                 <div role="status" class="slds-spinner slds-spinner_large">

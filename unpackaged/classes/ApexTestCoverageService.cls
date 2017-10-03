@@ -7,6 +7,12 @@ public with sharing class ApexTestCoverageService {
 
 	private static ApexTestCoverageService coverageTestService;
 
+	private ApexTestSuiteService testSuiteService;
+
+	private ApexTestCoverageService() {
+		this.testSuiteService = ApexTestSuiteService.getInstance();
+	}
+
 	public static ApexTestCoverageService getInstance() {
 		if(coverageTestService == null) {
 			coverageTestService = new ApexTestCoverageService();
@@ -14,15 +20,31 @@ public with sharing class ApexTestCoverageService {
 		return coverageTestService;
 	}
 
-	public static String createQuery() {
-		return 'SELECT ApexClassOrTrigger.Name, '
-			+ ' ApexClassorTriggerId, NumLinesCovered, NumLinesUncovered'
-			+ ' FROM ApexCodeCoverageAggregate'
-			+ ' ORDER BY ApexClassOrTrigger.Name';
+//	public static String createQuery() {
+//		return createQuery(new Set<Id>());
+//	}
+
+	public static String createQuery(Set<Id> classIdSet) {
+		String query = 'SELECT ApexClassOrTrigger.Name, '
+				+ ' ApexClassorTriggerId, NumLinesCovered, NumLinesUncovered'
+				+ ' FROM ApexCodeCoverageAggregate ';
+		if(!classIdSet.isEmpty()) {
+			query += 'WHERE ' + buildWhereId('ApexClassorTriggerId', classIdSet);
+		}
+		query += ' ORDER BY ApexClassOrTrigger.Name';
+		return query;
 	}
 
-	public static String createToolingQueryEndpoint() {
-		final String objectIdQuery = createQuery();
+	private static String buildWhereId(String fieldName, Set<Id> idSet) {
+		final List<String> inIdList = new List<String>();
+		for(Id idW : idSet) {
+			inIdList.add('\'' + idW + '\'');
+		}
+		return fieldName + ' IN (' + String.join(inIdList, ',') + ')';
+	}
+
+	public static String createToolingQueryEndpoint(Set<Id> classIdSet) {
+		final String objectIdQuery = createQuery(classIdSet);
 		final String environmentURL = URL.getSalesforceBaseUrl().toExternalForm()
 				+ TOOLING_QUERY
 				+ EncodingUtil.urlEncode(objectIdQuery, 'UTF-8');
@@ -85,6 +107,10 @@ public with sharing class ApexTestCoverageService {
 		return response.getStatusCode() == 200;
 	}
 
+	private Boolean isUnauthorized(HttpResponse response) {
+		return response.getStatusCode() == 401;
+	}
+
 	private String buildBody(ConnectRemote__c connect) {
 		return 'grant_type=password'
 				+ '&client_id=' + connect.Client_ID__c
@@ -93,14 +119,26 @@ public with sharing class ApexTestCoverageService {
 				+ '&password=' + connect.Password__c;
 	}
 
+	public Map<String, ApexCodeCoverageAggregate> getCodeCoverage(ApexTestSuite apexTestSuite) {
+		final List<TestSuiteMembership> memberList =
+				testSuiteService.findTestSuiteMembership(apexTestSuite);
+		final Set<Id> classOrTriggerIdSet = ApexTestSuiteService.createSetId(memberList);
+		return getCodeCoverage(classOrTriggerIdSet);
+	}
+
 	public Map<String, ApexCodeCoverageAggregate> getCodeCoverage() {
+		return getCodeCoverage(new Set<Id>());
+	}
+
+	public Map<String, ApexCodeCoverageAggregate> getCodeCoverage(Set<Id> classIdSet) {
+		System.debug('getCodeCoverage() ' + classIdSet);
 		final Map<String, ConnectRemote__c> gitConnectMap = ConnectRemote__c.getAll();
 		final ConnectRemote__c connect = gitConnectMap.get('Salesforce');
 
 		authenticate(connect);
 
 		try {
-			return getCodeCoverage(connect);
+			return getCodeCoverage(classIdSet, connect);
 
 		} catch (Exception ex) {
 			System.debug('Ex: ' + ex);
@@ -108,20 +146,23 @@ public with sharing class ApexTestCoverageService {
 			connect.Bearer__c = null;
 			authenticate(connect);
 
-			return getCodeCoverage(connect);
+			return getCodeCoverage(classIdSet, connect);
 		}
 
 		return new Map<String, ApexCodeCoverageAggregate>();
 	}
 
-	private Map<String, ApexCodeCoverageAggregate> getCodeCoverage(ConnectRemote__c connect) {
+	private Map<String, ApexCodeCoverageAggregate> getCodeCoverage(Set<Id> classIdSet, ConnectRemote__c connect) {
 		if(!isBearer(connect)) {
 			return new Map<String, ApexCodeCoverageAggregate>();
 		}
 
-		final HTTPResponse response = callHttpRequestCodeCoverage(connect);
+		final HTTPResponse response = callHttpRequestCodeCoverage(classIdSet, connect);
 
-		if(!isSuccess(response)) {
+		if(isUnauthorized(response)) {
+			throw new UnauthorizedException('Status Unauthorized - 401');
+
+		} else if(!isSuccess(response)) {
 			return new Map<String, ApexCodeCoverageAggregate>();
 		}
 
@@ -138,16 +179,18 @@ public with sharing class ApexTestCoverageService {
 		return classCoverageMap;
 	}
 
-	private HTTPResponse callHttpRequestCodeCoverage(ConnectRemote__c connect) {
+	private HTTPResponse callHttpRequestCodeCoverage(Set<Id> classIdSet, ConnectRemote__c connect) {
 		System.debug('callHttpRequestCodeCoverage() connect: ' + connect);
 
 		final HttpRequest req = new HttpRequest();
 		req.setMethod('GET');
 		req.setHeader('Authorization', 'Bearer ' + connect.Bearer__c);
 		req.setHeader('Content-Type', CONTENT_TYPE_JSON);
-		req.setEndpoint(createToolingQueryEndpoint());
+		req.setEndpoint(createToolingQueryEndpoint(classIdSet));
 		return httpSend(req);
 	}
+
+	private class UnauthorizedException extends Exception { }
 
 	public class SalesforceOauth {
 		public String access_token;

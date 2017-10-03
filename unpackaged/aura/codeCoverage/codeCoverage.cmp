@@ -3,12 +3,128 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-    <aura:attribute name="myObject" type="List"/>
+    <aura:attribute name="codeCovegareList" type="List"/>
+    <aura:attribute name="testSuiteMap" type="Map"/>
+    <aura:attribute name="testSuiteList" type="List"/>
+    <aura:attribute name="selectId" type="String"/>
 
-    <section class="stage slds-grid slds-grid--vertical slds-nowrap">
+    <section class="stage slds-p-around_medium slds-grid slds-grid--vertical slds-nowrap">
 
-        <table class="slds-table slds-table_bordered slds-tree slds-table_tree" role="treegrid" aria-readonly="true">
-            <thead>
+        <div class="slds-page-header slds-box">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container" title="Description of icon when needed">
+                                <lightning:icon iconName="utility:apex" size="medium" alternativeText="Indicates approval"/>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <nav>
+                                <ol class="slds-breadcrumb slds-line-height_reset">
+                                    <li class="slds-breadcrumb__item">
+                                        <span>Classes Cobertura</span>
+                                    </li>
+                                </ol>
+                            </nav>
+                            <h1 class="slds-page-header__title slds-m-right_small slds-align-middle slds-truncate"
+                                title="Acme - 1,200 Widgets">
+                                84% <span class="slds-badge">Cobertura</span>
+                                <span class="slds-badge">100 - Classes</span>
+                                <span class="slds-badge">150/1456 -Linhas Cobertas</span></h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-col slds-no-flex slds-grid slds-align-top">
+
+                    <div class="slds-button-group" role="group">
+                        <div class="slds-form-element">
+                            <!--label class="slds-form-element__label" for="combobox-unique-id">Search</label-->
+
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container">
+                                    <div aura:id="testSuiteDropdown" class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                                         aria-expanded="true" aria-haspopup="listbox" role="combobox">
+
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                            <ui:inputText aura:id="testSuiteInput" click="{!c.showTestSuiteList}"
+                                                          class="slds-input slds-combobox__input" placeholder="Test Suite"/>
+                                            <!--input  type="text" class="slds-input slds-combobox__input" id="combobox-unique-id"
+                                                   aria-controls="listbox-unique-id" autocomplete="off" role="textbox"
+                                                   placeholder="Select an Option" value="Salesforce.com, Inc."
+                                                   readonly="" aria-activedescendant="listbox-option-unique-id-01"
+                                                   onclick="{!c.showTestSuiteList}"/-->
+
+                                            <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right"
+                                                  title="Description of icon when needed">
+                                                <lightning:icon iconName="utility:down" size="xx-small"/>
+                                                <span class="slds-assistive-text">Description of icon</span>
+                                            </span>
+                                        </div>
+
+                                        <div id="listbox-unique-id" role="listbox">
+                                            <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid" role="presentation">
+                                                <aura:iteration var="item" items="{!v.testSuiteList}">
+                                                    <li role="presentation" class="slds-listbox__item">
+                                                        <span data-value="{! item.id }"
+                                                              class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center"
+                                                              role="option" onclick="{! c.selectTestSuite }">
+
+
+                                                            <span class="slds-media__figure">
+                                                                <aura:renderIf isTrue="{! item.select }">
+                                                                    <lightning:icon iconName="utility:check" size="xx-small"/>
+                                                                    <aura:set attribute="else">
+                                                                        &nbsp; &nbsp; &nbsp;
+                                                                    </aura:set>
+                                                                </aura:renderIf>
+                                                            </span>
+
+                                                            <span class="slds-media__body">
+                                                                <span class="slds-truncate" title="">{! item.name }</span>
+                                                            </span>
+                                                        </span>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--button class="slds-button slds-button_stateful slds-button_neutral slds-not-selected"
+                            aria-live="assertive" onclick="{!c.echo}">
+                        <span class="slds-text-not-selected">
+                            <lightning:icon iconName="utility:add" size="xx-small" alternativeText="Indicates approval"/>
+                            Follow</span>
+                        <span class="slds-text-selected">
+                             <lightning:icon iconName="utility:check" size="xx-small" alternativeText="Indicates approval"/>
+                           Following</span>
+                        <span class="slds-text-selected-focus">
+                            <lightning:icon iconName="utility:close" size="xx-small" alternativeText="Indicates approval"/>
+                           Unfollow</span>
+                    </button>
+
+                    <div class="slds-button-group" role="group">
+                        <button class="slds-button slds-button_neutral">Edit</button>
+                        <button class="slds-button slds-button_neutral">Delete</button>
+                        <button class="slds-button slds-button_neutral">Clone</button>
+                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_last" aria-expanded="false">
+                            <button class="slds-button slds-button_icon slds-button_icon-border-filled" aria-haspopup="true" title="More Actions">
+                                <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Indicates approval"/>
+                                <span class="slds-assistive-text">More Actions</span>
+                            </button>
+                        </div>
+                    </div-->
+                </div>
+            </div>
+
+            <br/>
+            <table class="slds-table slds-table_bordered slds-tree slds-table_tree" role="treegrid" aria-readonly="true">
+                <thead>
                 <tr class="slds-text-title_caps">
                     <th class="slds-cell-buffer_left" scope="col">
                         <div class="slds-grid slds-grid_vertical-align-center">
@@ -20,7 +136,6 @@
                         </div>
                     </th>
                     <th scope="col"><div class="slds-text-align_right slds-truncate" title="Linhas Cobertas">Linhas Cobertas</div></th>
-                    <th scope="col"><div class="slds-text-align_right slds-truncate" title="Linhas Não Cobertas">Linhas Não Cobertas</div></th>
                     <th scope="col"><div class="slds-text-align_right slds-truncate" title="Percentual"></div></th>
                     <th scope="col"><div class="slds-truncate" title="Porcentagem">Porcentagem</div></th>
                     <th scope="col" class="slds-cell-shrink">
@@ -33,10 +148,10 @@
                         </button>
                     </th>
                 </tr>
-            </thead>
+                </thead>
 
-            <tbody>
-                <aura:iteration var="coverage" items="{!v.myObject}">
+                <tbody>
+                <aura:iteration var="coverage" items="{!v.codeCovegareList}">
                     <tr aria-level="1" aria-posinset="1" aria-setsize="4" class="slds-hint-parent" tabindex="0">
                         <th class="slds-tree__item" data-label="Classe" scope="row">
                             <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-x-small slds-m-right_x-small" aria-hidden="true" tabindex="-1" title="Expand Rewis Inc">
@@ -51,15 +166,11 @@
 
                         <td data-label="Linhas Cobertas">
                             <div class="slds-text-align_right slds-truncate" title="5">
-                                {! coverage.numLinesCovered }</div></td>
-
-                        <td data-label="Linhas Não Cobertas">
-                            <div class="slds-text-align_right slds-truncate" title="10">
-                                    {! coverage.numLinesUncovered }</div></td>
+                                    {! coverage.numLinesCovered }/{! coverage.numLinesCovered + coverage.numLinesUncovered }</div></td>
 
                         <td data-label="%"><div class="slds-text-align_right slds-truncate" title="%">
                             <ui:outputNumber value="{!coverage.perc}" format="0.0"/>
-                             %</div></td>
+                            %</div></td>
                         <td data-label="Porcentagem">
                             <div class="slds-progress-bar" aria-valuemin="0"
                                  aria-valuemax="100"
@@ -80,7 +191,10 @@
                         </td>
                     </tr>
                 </aura:iteration>
-            </tbody>
-    </table>
+                </tbody>
+            </table>
+        </div>
+
+
     </section>
 </aura:component>
