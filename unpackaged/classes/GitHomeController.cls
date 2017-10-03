@@ -2,8 +2,8 @@ public with sharing class GitHomeController {
 
 	@AuraEnabled
 	public static String serverEcho(String firstName) {
-		Map<String, GitConnect__c> gitConnectMap = GitConnect__c.getAll();
-		return ('Hello from the server, ' + firstName + ' ' + gitConnectMap);
+		//Map<String, GitConnect__c> gitConnectMap = GitConnect__c.getAll();
+		return ('Hello from the server, ' + firstName + ' ');
 	}
 
 	@AuraEnabled

@@ -1,7 +1,11 @@
 public with sharing class ApexTestCoverageService {
 
-	private static ApexTestCoverageService coverageTestService;
+	private final String CONTENT_TYPE_URLENCODED = 'application/x-www-form-urlencoded';
+	private final String CONTENT_TYPE_JSON = 'application/json';
+
 	private static final String TOOLING_QUERY = '/services/data/v37.0/tooling/query/?q=';
+
+	private static ApexTestCoverageService coverageTestService;
 
 	public static ApexTestCoverageService getInstance() {
 		if(coverageTestService == null) {
@@ -17,7 +21,7 @@ public with sharing class ApexTestCoverageService {
 			+ ' ORDER BY ApexClassOrTrigger.Name';
 	}
 
-	public static String createEndpoint() {
+	public static String createToolingQueryEndpoint() {
 		final String objectIdQuery = createQuery();
 		final String environmentURL = URL.getSalesforceBaseUrl().toExternalForm()
 				+ TOOLING_QUERY
@@ -25,43 +29,128 @@ public with sharing class ApexTestCoverageService {
 		return environmentURL;
 	}
 
-	public Map<String, ApexCodeCoverageAggregate> callHttpRequest() {
-//		HttpRequest req = new HttpRequest();
-//		req.setMethod('POST');
-//		req.setHeader('Content-Type','application/x-www-form-urlencoded');
-//		req.setEndpoint('https://ap5.salesforce.com/services/oauth2/token');
-//
-//		String CLIENT_ID = '3MVG9KI2HHAq33RyCXLr7ztl_lvwe7pXW2rtlrSVj_s5loAZ2ErjL3IZ2kxdERppa_DN5OhBU.iyIPhOMLZv5';
-//		String CLIENT_SECRET = '2987054690991388622';
-//		String USERNAME = 'andre.leite@pjsign.com.br';
-//		String PASSWORD = 'soad87ww';
-//
-//		req.setBody('grant_type=password' + '&client_id='+CLIENT_ID +
-//				'&client_secret='+CLIENT_SECRET + '&username='+USERNAME + '&password='+PASSWORD);
-//
-//		Http http = new Http();
-//		HTTPResponse response = http.send(req);
-//		System.debug('Body ' + response.getBody());
-//		System.debug('Status ' + response.getStatus());
-//		System.debug('Status code ' + response.getStatusCode());
+	public static String createOauth2Endpoint(final String url) {
+		final String environmentURL = System.URL.getSalesforceBaseUrl().toExternalForm()
+				+ '' + url;
+		return environmentURL;
+	}
 
-		HttpRequest req = new HttpRequest();
-		req.setMethod('GET');
-		req.setHeader('Authorization', 'Bearer 00D61000000KRpr!AQoAQCUwGQGHzJdfeJaRlEMO4Ajxsf2SBOtPVi5lK4DMhuAO.MfbYXNcnCFX2xUosHmbr48A0yX1zNppnNTp4EpwO8_FPk0n');
-		req.setHeader('Content-Type', 'application/json');
-		req.setEndpoint(createEndpoint());
+	public ConnectRemote__c authenticate(ConnectRemote__c connect) {
+		System.debug('authenticate() connect: ' + connect);
 
-		final String body = new Http().send(req).getBody();
-		System.debug('body: ' + body);
-		ApexTestCoverageService.ApexCodeCoverage apexCodeCoverageAggrregate =
-				(ApexTestCoverageService.ApexCodeCoverage)JSON.deserialize(body,
-								ApexTestCoverageService.ApexCodeCoverage.class);
+		if(isBearer(connect)) {
+			return connect;
+		}
+
+		final HTTPResponse response = callHttpRequestAuthenticate(connect);
+
+		if(!isSuccess(response)) {
+			return connect;
+		}
+
+		final SalesforceOauth salesforceOauth = (SalesforceOauth) JSON.deserialize(
+				response.getBody(), ApexTestCoverageService.SalesforceOauth.class);
+
+		connect.Bearer__c = salesforceOauth.access_token;
+		return connect;
+	}
+
+	private Boolean isBearer(ConnectRemote__c connect) {
+		return connect.Bearer__c != null;
+	}
+
+	private HTTPResponse callHttpRequestAuthenticate(ConnectRemote__c connect) {
+		System.debug('callHttpRequestAuthenticate() connect: ' + connect);
+
+		final HttpRequest req = new HttpRequest();
+		req.setMethod('POST');
+		req.setHeader('Content-Type', CONTENT_TYPE_URLENCODED);
+		req.setEndpoint(createOauth2Endpoint(connect.URL__c));
+		req.setBody(buildBody(connect));
+
+		return httpSend(req);
+	}
+
+	private HttpResponse httpSend(HttpRequest req) {
+		System.debug('httpSend() req: ' + req);
+
+		final HTTPResponse response =  new Http().send(req);
+		System.debug('Body ' + response.getBody());
+		System.debug('Status ' + response.getStatus());
+		System.debug('Status code ' + response.getStatusCode());
+		return response;
+	}
+
+	private Boolean isSuccess(HttpResponse response) {
+		return response.getStatusCode() == 200;
+	}
+
+	private String buildBody(ConnectRemote__c connect) {
+		return 'grant_type=password'
+				+ '&client_id=' + connect.Client_ID__c
+				+ '&client_secret=' + connect.Client_Secret__c
+				+ '&username=' + connect.Username__c
+				+ '&password=' + connect.Password__c;
+	}
+
+	public Map<String, ApexCodeCoverageAggregate> getCodeCoverage() {
+		final Map<String, ConnectRemote__c> gitConnectMap = ConnectRemote__c.getAll();
+		final ConnectRemote__c connect = gitConnectMap.get('Salesforce');
+
+		authenticate(connect);
+
+		try {
+			return getCodeCoverage(connect);
+
+		} catch (Exception ex) {
+			System.debug('Ex: ' + ex);
+
+			connect.Bearer__c = null;
+			authenticate(connect);
+
+			return getCodeCoverage(connect);
+		}
+
+		return new Map<String, ApexCodeCoverageAggregate>();
+	}
+
+	private Map<String, ApexCodeCoverageAggregate> getCodeCoverage(ConnectRemote__c connect) {
+		if(!isBearer(connect)) {
+			return new Map<String, ApexCodeCoverageAggregate>();
+		}
+
+		final HTTPResponse response = callHttpRequestCodeCoverage(connect);
+
+		if(!isSuccess(response)) {
+			return new Map<String, ApexCodeCoverageAggregate>();
+		}
+
+		final ApexCodeCoverage apexCodeCoverage = (ApexCodeCoverage) JSON.deserialize(
+				response.getBody(), ApexTestCoverageService.ApexCodeCoverage.class);
 
 		final Map<String, ApexCodeCoverageAggregate> classCoverageMap = new Map<String, ApexCodeCoverageAggregate>();
-		for(ApexCodeCoverageAggregate agrr : apexCodeCoverageAggrregate.records) {
+		for(ApexCodeCoverageAggregate agrr : apexCodeCoverage.records) {
 			classCoverageMap.put(agrr.apexClassOrTriggerId, agrr);
 		}
+
+		UPDATE connect;
+
 		return classCoverageMap;
+	}
+
+	private HTTPResponse callHttpRequestCodeCoverage(ConnectRemote__c connect) {
+		System.debug('callHttpRequestCodeCoverage() connect: ' + connect);
+
+		final HttpRequest req = new HttpRequest();
+		req.setMethod('GET');
+		req.setHeader('Authorization', 'Bearer ' + connect.Bearer__c);
+		req.setHeader('Content-Type', CONTENT_TYPE_JSON);
+		req.setEndpoint(createToolingQueryEndpoint());
+		return httpSend(req);
+	}
+
+	public class SalesforceOauth {
+		public String access_token;
 	}
 
 	public class ApexCodeCoverage {
