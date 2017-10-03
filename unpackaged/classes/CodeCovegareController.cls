@@ -4,7 +4,7 @@ public class CodeCovegareController {
 	public static List<CodeCovegare> getCodeCovegare(String session) {
 		System.debug('UserInfo.getSessionID() : ' + UserInfo.getSessionID());
 		final Map<String, ApexTestCoverageService.ApexCodeCoverageAggregate> covegareMap =
-				ApexTestCoverageService.getInstance().callHttpRequest();
+				ApexTestCoverageService.getInstance().getCodeCoverage();
 
 		final List<CodeCovegare> covegareList = new List<CodeCovegare>();
 		for(ApexTestCoverageService.ApexCodeCoverageAggregate code: covegareMap.values()) {
