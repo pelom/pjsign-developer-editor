@@ -1,0 +1,24 @@
+.THIS { }
+p.THIS { font-size: 24px; }
+.THIS .toggle { display: none; }
+
+.THIS .header {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07);
+  z-index: 1;
+}
+
+.THIS .cursor-point:hover { cursor: pointer }
+
+.THIS .stage-left {
+    min-width: 180px;
+    overflow-y: auto;
+}
+.THIS .stage-container {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.THIS slds-grid--frame {
+  min-width: 767px;
+  overflow-y: auto;
+}

@@ -1,0 +1,16 @@
+<apex:page extensions="SessaoCaixaController" standardController="SessaoCaixa__c" action="{!atualizarSessao}">
+    
+    <apex:sectionHeader title="Sessão Caixa" subtitle="Atualização de Sessão"/>
+    
+    <apex:form id="form">
+        <div class="ptBreadcrumb">&nbsp;«&nbsp;
+            <apex:outputLink value="../{!sessaoCaixaId}">Volta à página: Sessão Caixa</apex:outputLink>
+        </div>
+        <br/>
+        <apex:outputPanel id="msg-panel">
+            <apex:pageMessages />
+        </apex:outputPanel>
+        <br/>
+    </apex:form>
+    
+</apex:page>

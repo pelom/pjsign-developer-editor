@@ -1,0 +1,86 @@
+<aura:component controller="CodeCovegareController">
+    <aura:html tag="div"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:attribute name="myObject" type="List"/>
+
+    <section class="stage slds-grid slds-grid--vertical slds-nowrap">
+
+        <table class="slds-table slds-table_bordered slds-tree slds-table_tree" role="treegrid" aria-readonly="true">
+            <thead>
+                <tr class="slds-text-title_caps">
+                    <th class="slds-cell-buffer_left" scope="col">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small slds-m-right_x-small slds-shrink-none slds-table_tree__toggle" tabindex="-1" title="Expand all rows">
+                                <lightning:icon iconName="utility:chevrondown" size="xx-small" alternativeText="Indicates approval"/>
+                                <span class="slds-assistive-text">Expand all rows</span>
+                            </button>
+                            <div class="slds-truncate" title="Classe">Classe</div>
+                        </div>
+                    </th>
+                    <th scope="col"><div class="slds-text-align_right slds-truncate" title="Linhas Cobertas">Linhas Cobertas</div></th>
+                    <th scope="col"><div class="slds-text-align_right slds-truncate" title="Linhas Não Cobertas">Linhas Não Cobertas</div></th>
+                    <th scope="col"><div class="slds-text-align_right slds-truncate" title="Percentual"></div></th>
+                    <th scope="col"><div class="slds-truncate" title="Porcentagem">Porcentagem</div></th>
+                    <th scope="col" class="slds-cell-shrink">
+                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small"
+                                aria-haspopup="true" tabindex="-1" title="Show More">
+                            <lightning:icon iconName="utility:down" size="xx-small"
+                                            class="slds-button__icon slds-button__icon_hint slds-button__icon_small"
+                                            alternativeText="Indicates approval"/>
+                            <span class="slds-assistive-text">Show More</span>
+                        </button>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <aura:iteration var="coverage" items="{!v.myObject}">
+                    <tr aria-level="1" aria-posinset="1" aria-setsize="4" class="slds-hint-parent" tabindex="0">
+                        <th class="slds-tree__item" data-label="Classe" scope="row">
+                            <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-x-small slds-m-right_x-small" aria-hidden="true" tabindex="-1" title="Expand Rewis Inc">
+                                <lightning:icon iconName="utility:chevronright" size="xx-small"
+                                                class="slds-button__icon slds-button__icon_hint slds-button__icon_small"
+                                                alternativeText="Indicates approval"/>
+                                <span class="slds-assistive-text">Collapse Rewis Inc</span>
+                            </button>
+                            <div class="slds-truncate" title="Rewis Inc">
+                                <a href="javascript:void(0);" tabindex="-1">{!coverage.apexClassName }</a></div>
+                        </th>
+
+                        <td data-label="Linhas Cobertas">
+                            <div class="slds-text-align_right slds-truncate" title="5">
+                                {! coverage.numLinesCovered }</div></td>
+
+                        <td data-label="Linhas Não Cobertas">
+                            <div class="slds-text-align_right slds-truncate" title="10">
+                                    {! coverage.numLinesUncovered }</div></td>
+
+                        <td data-label="%"><div class="slds-text-align_right slds-truncate" title="%">
+                            <ui:outputNumber value="{!coverage.perc}" format="0.0"/>
+                             %</div></td>
+                        <td data-label="Porcentagem">
+                            <div class="slds-progress-bar" aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-valuenow="{!coverage.perc}" role="progressbar">
+                              <span class="slds-progress-bar__value" style="{!'width:' + coverage.perc + '%'}">
+                                <span class="slds-assistive-text">Progress: {!coverage.perc}%</span>
+                              </span>
+                            </div>
+                        </td>
+                        <td class="slds-cell-shrink">
+                            <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="-1" title="More actions for Rewis Inc">
+
+                                <lightning:icon iconName="utility:down" size="xx-small"
+                                                class="slds-button__icon slds-button__icon_hint slds-button__icon_small"
+                                                alternativeText="Indicates approval"/>
+                                <span class="slds-assistive-text">More actions for Rewis Inc</span>
+                            </button>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+    </table>
+    </section>
+</aura:component>

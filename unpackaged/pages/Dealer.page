@@ -1,0 +1,141 @@
+<apex:page controller="DealerController" sidebar="true" title="Encontrar dealers">
+
+	<apex:includeScript value="https://code.jquery.com/jquery-3.0.0.min.js"/>
+    
+    <style>
+        .actionLink {
+        color: #015ba7 !important;
+        text-decoration: none;
+        font-weight: normal;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-right: 1px solid #BBB;
+        
+        }
+        .headerPainel {
+        margin: 5px;
+        }
+         .inputSearch {
+        line-height: 20px;
+        font-size: 14px;
+        }
+         .div-painel {
+        max-height: 250px;
+        overflow-y: scroll;
+        background: #EEE;
+        }
+    </style>
+    
+    <script>
+    j$ = $.noConflict();
+    j$(document).ready( function($) {
+    });
+    
+    j$(document).on("keypress", "[id$=textoChave]",function(event) {
+        
+        if(event.which == 13) {
+            event.preventDefault();
+            
+            if(j$(this).val().length > 2) {
+                j$('[id$=btnBuscar]').click();
+            }
+        }
+    });
+    
+    </script>
+    
+    <apex:sectionHeader title="Dealers"
+                        description="Encontre dealers pesquisando pelo Nome ou Sobrenome"
+                        subtitle="Localizar Dealer"/>
+    
+    <apex:form id="form">
+        
+        <apex:outputPanel id="msg-panel">
+            <apex:pageMessages />
+        </apex:outputPanel>
+        
+        <apex:outputPanel layout="block" styleClass="headerPainel">
+            <apex:inputText value="{!textoChave}"  id="textoChave" size="80" styleClass="inputSearch"
+                            html-placeholder="Pesquise por Nome, Sobrenome, Email ou CPF"/>
+            &nbsp;
+            <apex:commandButton value="Buscar" action="{!buscar}" reRender="form" status="buscarStatus" id="btnBuscar"/>
+            <apex:commandLink action="/003/e?&RecordType=0126100000074nF&accid={!accClube.Id}" value="Novo Dealer" />
+            
+            <apex:actionStatus id="buscarStatus">
+                <apex:facet name="start">
+                    <img src="/img/loading.gif" />
+                </apex:facet>
+            </apex:actionStatus>
+        </apex:outputPanel>
+        
+        <apex:pageBlock >
+            
+            <apex:pageBlockSection collapsible="false" title="Resultado(s) da pesquisar">
+            </apex:pageBlockSection>
+            
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!dealerList}" var="dea" align="center">
+                    <apex:column width="200">
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Ações: O que deseja fazer?"/>
+                        </apex:facet>
+                        <apex:outputLink styleClass="actionLink" value="/apex/DealerEditar?sfdc.tabName=01r61000000hot0&Id={!dea.Id}">Editar</apex:outputLink>   
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Nome"/>
+                        </apex:facet>
+                        <apex:outputLink value="/{!dea.Id}">{!dea.FirstName} {!dea.LastName}</apex:outputLink>
+                    </apex:column>
+                    <apex:column value="{!dea.MobilePhone}" />
+                    <apex:column value="{!dea.Email}" />
+                </apex:pageBlockTable>
+                <apex:outputPanel rendered="{!dealerList == null || dealerList.size == 0}">
+                    <apex:pageBlockSection collapsible="false" columns="1">
+                        <i class="no-records">Não há registros!</i>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+        <apex:pageBlock rendered="{!dealerSessaoList.size != 0}">
+            
+             <apex:pageBlockSection collapsible="false" title="Sessões Dealers [Aberta]"> </apex:pageBlockSection>
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!dealerSessaoList}" var="d" align="center">
+                    <apex:column width="250">
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Ações: O que deseja fazer?"/>
+                        </apex:facet>
+                        <apex:outputLink rendered="{!sessaoCaixa != null}" styleClass="actionLink"
+                                         value="/apex/DealerMesa?sfdc.tabName=01r61000000hoRV&Id={!d.Dealer__c}&retUrl=/apex/Caixa?sfdc.tabName=01r61000000hoRV">Registrar Mesa</apex:outputLink>
+                        <apex:outputLink styleClass="actionLink" value="/{!d.Id}">Ver Sessão</apex:outputLink>
+                        
+                    </apex:column>
+                    
+                    <apex:column value="{!d.Name}" width="80"/> 
+                    <apex:column width="100" value="{!d.Dealer__r.Account.Conta__c}" />
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Nome"/>
+                        </apex:facet>
+                        <apex:outputLink value="/{!d.Dealer__c}">{!d.Dealer__r.FirstName} {!d.Dealer__r.LastName}</apex:outputLink>
+                    </apex:column>
+                    
+                   
+                    <apex:column value="{!d.Status__c}" width="100"/> 
+                    <apex:column value="{!d.CreatedDate}" />
+                    <apex:column value="{!d.CreatedBy.Name}" />
+                    
+                </apex:pageBlockTable>
+                <apex:outputPanel rendered="{!dealerSessaoList == null || dealerSessaoList.size == 0}">
+                    <apex:pageBlockSection collapsible="false" columns="1">
+                        <i class="no-records">Não há registros!</i>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            
+        </apex:pageBlock>
+        
+    </apex:form>
+</apex:page>

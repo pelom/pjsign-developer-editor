@@ -1,0 +1,438 @@
+<apex:page controller="CashHomeController" action="{!atualizarCaixa}" >
+    
+    <apex:includeScript value="https://code.jquery.com/jquery-3.0.0.min.js"/>
+    
+    <style>
+        body.sfdcBody.apexPageInline {
+        background: none;
+        margin: 0px;
+        }
+        .pbSubheader {
+        margin-top: 0;
+        }
+        .actionLink {
+        color: #015ba7 !important;
+        text-decoration: none;
+        font-weight: normal;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-right: 1px solid #BBB;
+        }
+      
+        html .brandQuaternaryBgr {
+        background: white !important;
+        }
+        .div-painel {
+        height: 150px;
+        overflow-y: scroll;
+        background: #EEE;
+        }
+        .div-painel-a {
+        height: 150px;
+        overflow-y: scroll;
+        background: #FFF;
+        }
+        .div-painel-a i {
+        font-size: 13px;
+        text-align: center;
+        width: 100%;
+        float: left;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #EEE
+        }
+        .div-painel-b {
+        height: 150px;
+        }
+        .div-painel-c {
+        height: 300px;
+        }
+        .pageBlockPainel-r {
+        width: 46%;
+        display: inline-table;
+        margin-left: 5px;
+        border: 1px solid #e0e3e5;
+        margin-bottom: 5px;
+        }
+        .pageBlockPainel-l {
+        width: 52%;
+        display: inline-table;
+        margin-right: 5px;
+        border: 1px solid #e0e3e5;
+        }
+        .col-valor {
+        text-align: right;
+        }
+        .painelAreaValor  {
+        border: 1px solid #DDD;
+        text-align: right;
+        margin-top: 15px;
+        }
+        .painelAreaValor div  {
+        background: #FFF !important;
+        color: #1797c0;
+        }
+        .painelAreaValor h3  {
+        background: #FFF !important;
+        color: #1797c0;
+        }
+        .painelValor {
+        font-size: 20px;
+        background: #FFF;
+        color: #1797c0;
+        padding-right: 5px;
+        padding-top: 20px;
+        padding-bottom: 5px;
+        }
+        .div-load {
+        float: right;
+        }
+    </style>
+    
+    <script>
+    j$ = $.noConflict();
+    j$(document).ready( function($) {
+    });
+    </script>
+    
+    <apex:form id="form">
+        
+        <apex:outputPanel id="msg-panel">
+            <apex:pageMessages />
+        </apex:outputPanel>
+        
+        <apex:pageBlock title="Gestão Sessão Caixa">
+            
+            <apex:pageBlockButtons location="top">
+                <apex:selectList value="{!sessaoCaixaSelect}" multiselect="false" size="1"
+                                 styleClass="div-load">
+                    <apex:selectOptions value="{!sessaoCaixaOption}" />
+                    <apex:actionSupport action="{!loadData}" status="statusLoading" event="onchange" reRender="form" />
+                </apex:selectList>
+                <apex:actionStatus id="statusLoading">
+                    <apex:facet name="start">
+                        <apex:outputPanel layout="block" styleClass="div-load">
+                            <img src="/img/loading.gif" />
+                            <apex:outputText value=" Carregando..."/> 
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+                
+            </apex:pageBlockButtons>
+            
+            <apex:outputPanel layout="block" >
+                <div class="pageBlockPainel-l">
+                    <apex:pageBlockSection collapsible="false" title="Mesas">
+                    </apex:pageBlockSection>
+                    <apex:outputPanel layout="block"  styleClass="div-painel-a">
+                        <apex:pageBlockTable value="{!mesaList}" var="me" align="center">
+                            
+                            <!--apex:column >
+                                <apex:facet name="header" >
+                                    <apex:outputLabel value=""/>
+                                </apex:facet>
+                                
+                                <apex:commandLink styleClass="actionLink"
+                                                  action="{!carregarJogadores}"
+                                                  status="buscarStatus" value="Selecionar" reRender="painelJog, painelDealer">
+                                    <apex:param name="mesaId" value="{!me.Id}"/>
+                                </apex:commandLink>
+                                
+                            </apex:column-->
+                            <apex:column >
+                                <apex:facet name="header" >
+                                    <apex:outputLabel value="Mesa"/>
+                                </apex:facet>
+                                
+                                <apex:outputLink value="/{!me.mesa.Id}" styleClass="actionLink"
+                                                 target="_blank">{!me.mesa.Name}</apex:outputLink>
+                                
+                            </apex:column>
+                            <apex:column value="{!me.mesa.Titulo__c}" />
+                            <!--apex:column value="{!me.Jogo__c}" /-->
+                            <apex:column value="{!me.mesa.TotalFichasCompradas__c}" headerClass="col-valor" styleClass="col-valor" />
+                            <apex:column value="{!me.mesa.TotalFichasCapile__c}" headerClass="col-valor" styleClass="col-valor" />
+                            <apex:column value="{!me.mesa.ValorRake__c}" headerClass="col-valor" styleClass="col-valor" />
+                            
+                            <apex:column styleClass="col-valor" >
+                                <apex:facet name="header" >
+                                    <apex:outputLabel value="Taxa (+)" styleClass="col-valor" />
+                                </apex:facet>
+                                
+                                <apex:outputText value="{!me.taxa}" styleClass="col-valor" />
+                            </apex:column>
+                           
+                        </apex:pageBlockTable>
+                        
+                        <apex:outputPanel rendered="{!mesaList.size == 0}">
+                            <apex:pageBlockSection collapsible="false" columns="1">
+                                <i class="no-records">Não há registros!</i>
+                            </apex:pageBlockSection>
+                        </apex:outputPanel>
+                        
+                </apex:outputPanel>
+            </div>
+            <div class="pageBlockPainel-r">
+                <apex:pageBlockSection collapsible="false" title="Sessão Caixa" >
+                </apex:pageBlockSection>
+                
+                <apex:outputPanel layout="block"  styleClass="div-painel-b">
+                    
+                    <apex:pageBlockTable value="{!sessaoCaixaList}" var="ses" align="center" >
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="Código"/>
+                            </apex:facet>
+                            <apex:outputLink styleClass="actionLink" target="_blank" value="/{!ses.Id}">{!ses.Name}</apex:outputLink>
+                        </apex:column>
+                        <apex:column value="{!ses.Status__c}" /> 
+                        <apex:column value="{!ses.CreatedDate}" />
+                        <apex:column value="{!ses.CreatedBy.Name}" />
+                    </apex:pageBlockTable>
+                    
+                    <apex:pageBlockSection collapsible="false" columns="3" showHeader="false" rendered="{!sessaoCaixa != null}">
+                        
+                        <apex:outputPanel layout="block" styleClass="painelAreaValor" >
+                            <apex:pageBlockSection collapsible="false" title="{!$ObjectType.SessaoCaixa__c.fields.ValorTotalEspecie__c.Label}" >
+                            </apex:pageBlockSection>
+                            <apex:outputPanel layout="block" styleClass="painelValor">
+                                <apex:outputField value="{!sessaoCaixa.ValorTotalEspecie__c}" />
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        
+                        <apex:outputPanel layout="block" styleClass="painelAreaValor" >
+                            <apex:pageBlockSection collapsible="false" title="{!$ObjectType.SessaoCaixa__c.fields.ValorTotalSacado__c.Label}" >
+                            </apex:pageBlockSection>
+                            <apex:outputPanel layout="block" styleClass="painelValor">
+                                <apex:outputField value="{!sessaoCaixa.ValorTotalSacado__c}" />
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        
+                        <apex:outputPanel layout="block" styleClass="painelAreaValor" >
+                            <apex:pageBlockSection collapsible="false" title="{!$ObjectType.SessaoCaixa__c.fields.ValorPendente__c.Label}" >
+                            </apex:pageBlockSection>
+                            <apex:outputPanel layout="block" styleClass="painelValor">
+                                <apex:outputField value="{!sessaoCaixa.ValorPendente__c}" />
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </div>
+            </apex:outputPanel>
+            <apex:outputPanel layout="block" styleClass="pageBlockPainel-f">
+                
+                <apex:outputPanel layout="block" id="painelDealer">
+                    <apex:pageBlockSection collapsible="false" title="Sessões Dealers">
+                    </apex:pageBlockSection>
+                    <apex:outputPanel layout="block"  styleClass="div-painel-a">
+                        <apex:pageBlockTable value="{!dealerSessaoList}" var="d" align="center">
+                            <apex:column >
+                                <apex:facet name="header">
+                                    <apex:outputLabel value="{!$ObjectType.DealerMesa__c.fields.Name.Label}"/>
+                                </apex:facet>
+                                <apex:outputLink target="_blank" styleClass="actionLink"
+                                                 value="/{!d.Id}">{!d.Name}</apex:outputLink>
+                            </apex:column>
+                            
+                            <apex:column >
+                                <apex:facet name="header">
+                                    <apex:outputLabel value="{!$ObjectType.DealerMesa__c.fields.Dealer__c.Label}"/>
+                                </apex:facet>
+                                <apex:outputLink target="_blank" 
+                                                 value="/{!d.Dealer__c}">{!d.Dealer__r.FirstName} {!d.Dealer__r.LastName}</apex:outputLink>
+                            </apex:column>
+                            
+                            <apex:column value="{!d.Status__c}" />
+                            <apex:column value="{!d.DataEntrada__c}" />
+                            <apex:column value="{!d.DataSaida__c}" />
+                            <apex:column value="{!d.ValorTotalCapile__c}" headerClass="col-valor" styleClass="col-valor" />
+                        </apex:pageBlockTable>
+                        <apex:outputPanel rendered="{!dealerSessaoList.size == 0}">
+                            <apex:pageBlockSection collapsible="false" columns="1">
+                                <i class="no-records">Não há registros!</i>
+                            </apex:pageBlockSection>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                
+                <apex:outputPanel layout="block"  styleClass="div-painel-a div-painel-c">
+                    <apex:pageBlockSection collapsible="false" title="Jogadores Sessões">
+                    </apex:pageBlockSection>
+                    <apex:pageBlockTable value="{!sessaoJogadorList}" var="sj" align="center" >
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.Name.Label}"/>
+                            </apex:facet>
+                            <apex:outputLink target="_blank" styleClass="actionLink"
+                                             value="/{!sj.sCash.Id}">{!sj.sCash.Name}</apex:outputLink>
+                        </apex:column>
+                        
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.Cliente__c.Label}"/>
+                            </apex:facet>
+                            <apex:outputLink target="_blank" 
+                                             value="/{!sj.sCash.Cliente__c}">{!sj.sCash.Cliente__r.FirstName} {!sj.sCash.Cliente__r.LastName}</apex:outputLink>
+                        </apex:column>
+                        <apex:column value="{!sj.sCash.Status__c}" />
+                        <apex:column value="{!sj.sCash.FormaPagamento__c}"/>
+                        
+                        <apex:column styleClass="col-valor" >
+                            <apex:facet name="header" >
+                                <apex:outputLabel value="Total horas" styleClass="col-valor" />
+                            </apex:facet>
+                            
+                            <apex:outputText value="{!sj.totalHoras}" styleClass="col-valor" />
+                        </apex:column>
+                        
+                        <apex:column styleClass="col-valor" >
+                            <apex:facet name="header" >
+                                <apex:outputLabel value="Resultados" styleClass="col-valor" />
+                            </apex:facet>
+                            
+                            <apex:outputText value="{!sj.valor}" styleClass="col-valor" />
+                        </apex:column>
+                        
+                        <apex:column value="{!sj.sCash.TotalFichasPendente__c}" headerClass="col-valor" styleClass="col-valor" />
+                        <apex:column value="{!sj.sCash.TotalFichas__c}" headerClass="col-valor" styleClass="col-valor" />
+                        <apex:column value="{!sj.sCash.FichaDevolvida__c}" headerClass="col-valor" styleClass="col-valor" />
+                    	
+                    </apex:pageBlockTable>
+                     <apex:outputPanel rendered="{!sessaoJogadorList.size == 0}">
+                            <apex:pageBlockSection collapsible="false" columns="1">
+                                <i class="no-records">Não há registros!</i>
+                            </apex:pageBlockSection>
+                        </apex:outputPanel>
+                </apex:outputPanel>
+                
+            </apex:outputPanel>
+                
+        </apex:pageBlock>
+        
+        <!--div class="pageBlockPainel-l">
+            <apex:pageBlock >
+                
+                <apex:outputPanel layout="block" id="painelJog">
+                    <apex:actionStatus id="buscarStatus">
+                        <apex:facet name="start">
+                            <apex:outputPanel layout="block">
+                                <img src="/img/loading.gif" />
+                                <apex:outputText value=" Carregando..."/> 
+                            </apex:outputPanel>
+                        </apex:facet>
+                    </apex:actionStatus>
+                    
+                    <apex:pageBlockSection collapsible="false" title="Mesas">
+                    </apex:pageBlockSection>
+                    <apex:outputPanel layout="block"  styleClass="div-painel-a">
+                        <apex:pageBlockTable value="{!mesaList}" var="me" align="center" rendered="{!mesaList.size != 0}">
+                            
+                            <apex:column >
+                                <apex:facet name="header" >
+                                    <apex:outputLabel value=""/>
+                                </apex:facet>
+                                
+                                <apex:commandLink styleClass="actionLink"
+                                                  action="{!carregarJogadores}"
+                                                  status="buscarStatus" value="Selecionar" reRender="painelJog, painelDealer">
+                                    <apex:param name="mesaId" value="{!me.Id}"/>
+                                </apex:commandLink>
+                                
+                            </apex:column>
+                            <apex:column >
+                                <apex:facet name="header" >
+                                    <apex:outputLabel value="Mesa"/>
+                                </apex:facet>
+                                
+                                <apex:outputLink value="/{!me.Id}" target="_blank">{!me.Name}</apex:outputLink>
+                                
+                            </apex:column>
+                            <apex:column value="{!me.Titulo__c}" />
+                            <apex:column value="{!me.Jogo__c}" />
+                            <apex:column value="{!me.TotalFichasCompradas__c}" headerClass="col-valor" styleClass="col-valor" />
+                            <apex:column value="{!me.TotalFichasCapile__c}" headerClass="col-valor" styleClass="col-valor" />
+                            <apex:column value="{!me.ValorRake__c}" headerClass="col-valor" styleClass="col-valor" />
+                        </apex:pageBlockTable>
+                        
+                        <apex:outputPanel rendered="{!mesaList.size == 0}">
+                            <apex:pageBlockSection collapsible="false" columns="1">
+                                <i class="no-records">Não há registros!</i>
+                            </apex:pageBlockSection>
+                        </apex:outputPanel>
+                        
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                
+                <apex:outputPanel layout="block" id="painelDealer">
+                    <apex:pageBlockSection collapsible="false" title="Dealers {!mesaSelect.Name}">
+                    </apex:pageBlockSection>
+                    <apex:outputPanel layout="block"  styleClass="div-painel-a">
+                        <apex:pageBlockTable value="{!dealerMesaList}" var="d" align="center" rendered="{!dealerMesaList.size != 0}">
+                            <apex:column >
+                                <apex:facet name="header">
+                                    <apex:outputLabel value="{!$ObjectType.DealerMesa__c.fields.Name.Label}"/>
+                                </apex:facet>
+                                <apex:outputLink target="_blank" value="/{!d.Id}">{!d.Name}</apex:outputLink>
+                            </apex:column>
+                            
+                            <apex:column >
+                                <apex:facet name="header">
+                                    <apex:outputLabel value="{!$ObjectType.DealerMesa__c.fields.Dealer__c.Label}"/>
+                                </apex:facet>
+                                <apex:outputLink target="_blank" value="/{!d.Dealer__c}">{!d.Dealer__r.FirstName} {!d.Dealer__r.LastName}</apex:outputLink>
+                            </apex:column>
+                            
+                            <apex:column value="{!d.DataEntrada__c}" />
+                            <apex:column value="{!d.DataSaida__c}" />
+                            <apex:column value="{!d.ValorCapile__c}" headerClass="col-valor" styleClass="col-valor" />
+                        </apex:pageBlockTable>
+                        <apex:outputPanel rendered="{!dealerMesaList.size == 0}">
+                            <apex:pageBlockSection collapsible="false" columns="1">
+                                <i class="no-records">Não há registros!</i>
+                            </apex:pageBlockSection>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                
+            </apex:pageBlock>    
+        </div>
+        
+        <div class="pageBlockPainel-r">
+            
+            <c:SessaoCaixaView sessaoCaixaList="{!sessaoCaixaList}"></c:SessaoCaixaView>
+            <apex:pageBlock >
+                
+                <apex:pageBlockSection collapsible="false" title="Posição do Caixa" >
+                </apex:pageBlockSection>
+                <apex:pageBlockSection collapsible="false" columns="3" showHeader="false" rendered="{!sessaoCaixa != null}">
+                    
+                    <apex:outputPanel layout="block" styleClass="painelAreaValor" >
+                        <apex:pageBlockSection collapsible="false" title="{!$ObjectType.SessaoCaixa__c.fields.ValorTotalEspecie__c.Label}" >
+                        </apex:pageBlockSection>
+                        <apex:outputPanel layout="block" styleClass="painelValor green">
+                            <apex:outputField value="{!sessaoCaixa.ValorTotalEspecie__c}" />
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel layout="block" styleClass="painelAreaValor" >
+                        <apex:pageBlockSection collapsible="false" title="{!$ObjectType.SessaoCaixa__c.fields.ValorTotalSacado__c.Label}" >
+                        </apex:pageBlockSection>
+                        <apex:outputPanel layout="block" styleClass="painelValor yellow">
+                            <apex:outputField value="{!sessaoCaixa.ValorTotalSacado__c}" />
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel layout="block" styleClass="painelAreaValor" >
+                        <apex:pageBlockSection collapsible="false" title="{!$ObjectType.SessaoCaixa__c.fields.ValorPendente__c.Label}" >
+                        </apex:pageBlockSection>
+                        <apex:outputPanel layout="block" styleClass="painelValor red">
+                            <apex:outputField value="{!sessaoCaixa.ValorPendente__c}" />
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                </apex:pageBlockSection>
+            </apex:pageBlock>    
+        </div-->
+        
+    </apex:form>
+</apex:page>

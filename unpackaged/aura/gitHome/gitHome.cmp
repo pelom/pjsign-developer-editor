@@ -1,0 +1,81 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global"
+    controller="GitHomeController">
+
+    <aura:attribute name="firstName" type="String" default="Hello World"/>
+
+    <section class="stage slds-grid slds-grid--vertical slds-nowrap">
+
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-opportunity" title="Description of icon when needed">
+                                <lightning:icon iconName="utility:people" size="large" alternativeText="Indicates approval"/>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <nav>
+                                <ol class="slds-breadcrumb slds-line-height_reset">
+                                    <li class="slds-breadcrumb__item">
+                                        <span>Opportunities</span>
+                                    </li>
+                                </ol>
+                            </nav>
+                            <h1 class="slds-page-header__title slds-m-right_small slds-align-middle slds-truncate" title="Acme - 1,200 Widgets">Acme - 1,200 Widgets</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-col slds-no-flex slds-grid slds-align-top">
+                    <button class="slds-button slds-button_stateful slds-button_neutral slds-not-selected"
+                            aria-live="assertive" onclick="{!c.echo}">
+                        <span class="slds-text-not-selected">
+                            <lightning:icon iconName="utility:add" size="xx-small" alternativeText="Indicates approval"/>
+                            Follow</span>
+                        <span class="slds-text-selected">
+                             <lightning:icon iconName="utility:check" size="xx-small" alternativeText="Indicates approval"/>
+                           Following</span>
+                        <span class="slds-text-selected-focus">
+                            <lightning:icon iconName="utility:close" size="xx-small" alternativeText="Indicates approval"/>
+                           Unfollow</span>
+                    </button>
+                    <div class="slds-button-group" role="group">
+                        <button class="slds-button slds-button_neutral">Edit</button>
+                        <button class="slds-button slds-button_neutral">Delete</button>
+                        <button class="slds-button slds-button_neutral">Clone</button>
+                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_last" aria-expanded="false">
+                            <button class="slds-button slds-button_icon slds-button_icon-border-filled" aria-haspopup="true" title="More Actions">
+                                <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Indicates approval"/>
+                                <span class="slds-assistive-text">More Actions</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="slds-grid slds-page-header__detail-row">
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" title="Field 1">Field 1</p>
+                    <p class="slds-text-body_regular slds-truncate" title="Description that demonstrates truncation with a long text field">Description that demonstrates truncation with a long text field.</p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" title="Field2 (3)">Field 2 (3)
+                        <button class="slds-button slds-button_icon slds-button_icon" aria-haspopup="true" title="More Actions">
+                            <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Indicates approval"/>
+                            <span class="slds-assistive-text">More Actions</span>
+                        </button>
+                    </p>
+                    <p class="slds-text-body_regular">Multiple Values</p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" title="Field 3">Field 3</p>
+                    <a href="javascript:void(0);">Hyperlink</a></li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" title="Field 4">Field 4</p>
+                    <p title="Description (2-line truncation—must use JS to truncate).">Description (2-line truncati...</p>
+                </li>
+            </ul>
+        </div>
+    </section>
+</aura:component>

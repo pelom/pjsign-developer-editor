@@ -1,0 +1,217 @@
+<apex:page controller="CaixaController"  sidebar="true" title="Caixa {!IF(sessaoCaixa.Name != null, '[' + sessaoCaixa.Name + ']', '')} ">
+    
+    <apex:includeScript value="https://code.jquery.com/jquery-3.0.0.min.js"/>
+    
+    <style>
+        .actionLink {
+        color: #015ba7 !important;
+        text-decoration: none;
+        font-weight: normal;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-right: 1px solid #BBB;
+        
+        }
+        .headerPainel {
+        margin: 5px;
+        }
+         .inputSearch {
+        line-height: 20px;
+        font-size: 14px;
+        }
+        .div-painel {
+        max-height: 250px;
+        overflow-y: scroll;
+        background: #EEE;
+        }
+    </style>
+    
+    <script>
+    j$ = $.noConflict();
+    j$(document).ready( function($) {
+        
+        
+    });
+    j$(document).on("keypress", "[id$=textoChave]",function(event) {
+        
+        if(event.which == 13) {
+            event.preventDefault();
+            
+            j$('[id$=btnBuscar]').click();
+            
+            //if(j$(this).val().length > 2) {    
+            //}
+        }
+    });
+    </script>
+    
+    <apex:sectionHeader title="Caixa"
+                        description="Efetue a pesquisa para encontrar as Sessões Jogadores com a situação Aberta"
+                        subtitle="Sessão Caixa {!IF(sessaoCaixa.Name != null, '[' + sessaoCaixa.Name + ']', '')} "/>
+    
+    <apex:form id="form"> 
+        <apex:outputPanel layout="block" styleClass="headerPainel" rendered="{!sessaoCaixa != null}">
+            <apex:inputText value="{!textoChave}" id="textoChave" size="80" styleClass="inputSearch"
+                            html-placeholder="Pesquise por Nome ou Sobrenome"/>
+            &nbsp;
+            <apex:commandButton value="Buscar" action="{!buscar}" reRender="form" status="buscarStatus" id="btnBuscar"/>
+            <apex:actionStatus id="buscarStatus">
+                <apex:facet name="start">
+                    <img src="/img/loading.gif" />
+                </apex:facet>
+            </apex:actionStatus>
+        </apex:outputPanel>
+        
+        <apex:pageBlock rendered="{!textoChave !=null}">
+            <apex:pageBlockSection collapsible="false" title="Resultados da Pesquisar Sessão Jogador">
+            </apex:pageBlockSection>
+            
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!sessaoList}" var="ses" align="center" rendered="{!sessaoList.size != 0}">
+                    <apex:column width="250">
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Ações: O que deseja fazer?"/>
+                        </apex:facet>
+                        <apex:outputLink styleClass="actionLink" value="/apex/FechamentoSessaoJogador?sfdc.tabName=01r61000000hoRV&Id={!ses.Id}">Finalizar</apex:outputLink>
+                        <apex:outputLink styleClass="actionLink" value="{!$Page.JogadorCompraFicha}?sfdc.tabName=01r61000000ho8J&jogId={!ses.Cliente__c}">Comprar Ficha</apex:outputLink>
+                    	<apex:outputLink styleClass="actionLink" value="/{!ses.Id}">Ver Sessão</apex:outputLink>
+                    </apex:column>
+                    
+                    <apex:column value="{!ses.Name}" width="80" /> 
+                    <apex:column width="100" value="{!ses.Cliente__r.Account.Conta__c}" />                
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Nome do Cliente"/>
+                        </apex:facet>
+                        <apex:outputLink value="/{!ses.Cliente__c}">{!ses.Cliente__r.FirstName} {!ses.Cliente__r.LastName}</apex:outputLink>
+                    </apex:column>
+                    
+                    <apex:column value="{!ses.Status__c}" width="100" /> 
+                    <apex:column value="{!ses.CreatedDate}" />
+                    <apex:column value="{!ses.CreatedBy.Name}" />
+                </apex:pageBlockTable>
+                
+                <apex:outputPanel rendered="{!sessaoList.size == 0}">
+                    <apex:pageBlockSection collapsible="false" columns="1">
+                        <i class="no-records">Não há registros!</i>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            
+        </apex:pageBlock>
+        
+        <c:SessaoCaixaView sessaoCaixaList="{!sessaoCaixaList}"></c:SessaoCaixaView>
+        
+        <apex:pageBlock >
+            <apex:outputPanel id="msg-panel">
+                <apex:pageMessages />
+            </apex:outputPanel>
+            
+            <apex:pageBlockSection collapsible="false" title="Sessões Jogador[Aberta]"></apex:pageBlockSection>
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!jogSessaoList}" var="ses" align="center">
+                    <apex:column width="250">
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Ações: O que deseja fazer?"/>
+                        </apex:facet>
+                        <apex:outputLink styleClass="actionLink" value="/apex/FechamentoSessaoJogador?sfdc.tabName=01r61000000hoRV&Id={!ses.Id}">Finalizar</apex:outputLink>
+                        <apex:outputLink styleClass="actionLink" value="{!$Page.JogadorCompraFicha}?sfdc.tabName=01r61000000ho8J&jogId={!ses.Cliente__c}">Comprar Ficha</apex:outputLink>
+                        <apex:outputLink styleClass="actionLink" value="/{!ses.Id}">Ver Sessão</apex:outputLink>
+                    </apex:column>
+                    
+                    <apex:column width="80" value="{!ses.Name}" />
+                    <apex:column width="100" value="{!ses.Cliente__r.Account.Conta__c}" />
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Nome do Cliente"/>
+                        </apex:facet>
+                        <apex:outputLink value="/{!ses.Cliente__c}">{!ses.Cliente__r.FirstName} {!ses.Cliente__r.LastName}</apex:outputLink>
+                    </apex:column>
+                    
+                    <apex:column value="{!ses.Status__c}" width="100"/> 
+                    <apex:column value="{!ses.CreatedDate}" />
+                    <apex:column value="{!ses.CreatedBy.Name}" />
+                    
+                </apex:pageBlockTable>
+                
+                <apex:outputPanel rendered="{!jogSessaoList.size == 0}">
+                    <apex:pageBlockSection collapsible="false" columns="1">
+                        <i class="no-records">Não há registros!</i>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                
+            </apex:outputPanel>
+            
+            <apex:pageBlockSection collapsible="false" title="Sessões Dealer [Aberta]"> </apex:pageBlockSection>
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!dealerSessaoList}" var="d" align="center">
+                    <apex:column width="250">
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Ações: O que deseja fazer?"/>
+                        </apex:facet>
+                        <apex:outputLink rendered="{!sessaoCaixa != null}" styleClass="actionLink"
+                                         value="/apex/DealerMesa?sfdc.tabName=01r61000000hoRV&Id={!d.Dealer__c}&retUrl=/apex/Caixa?sfdc.tabName=01r61000000hoRV">Registrar Mesa</apex:outputLink>
+                        <apex:outputLink styleClass="actionLink" value="/{!d.Id}">Ver Sessão</apex:outputLink>
+                        
+                    </apex:column>
+                    
+                    <apex:column value="{!d.Name}" width="80"/> 
+                    <apex:column width="100" value="{!d.Dealer__r.Account.Conta__c}" />
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Nome"/>
+                        </apex:facet>
+                        <apex:outputLink value="/{!d.Dealer__c}">{!d.Dealer__r.FirstName} {!d.Dealer__r.LastName}</apex:outputLink>
+                    </apex:column>
+                    
+                   
+                    <apex:column value="{!d.Status__c}" width="100"/> 
+                    <apex:column value="{!d.CreatedDate}" />
+                    <apex:column value="{!d.CreatedBy.Name}" />
+                    
+                </apex:pageBlockTable>
+                <apex:outputPanel rendered="{!dealerSessaoList == null || dealerSessaoList.size == 0}">
+                    <apex:pageBlockSection collapsible="false" columns="1">
+                        <i class="no-records">Não há registros!</i>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            
+            <apex:pageBlockSection collapsible="false" title="Mesas [Aberta]"> </apex:pageBlockSection>
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!mesaList}" var="m" align="center">
+                    <apex:column width="250">
+                        <apex:facet name="header" >
+                            <apex:outputLabel value="Ações: O que deseja fazer?"/>
+                        </apex:facet>
+                        
+                        <apex:outputLink rendered="{!sessaoCaixa != null}" styleClass="actionLink"
+                                         value="{!$Page.MesaFila}?sfdc.tabName=01r610000002O2U&mesa={!m.Id}">
+                            Ver Jogadores</apex:outputLink>
+                        
+                        <apex:outputLink styleClass="actionLink" value="/{!m.Id}">Ver Mesa</apex:outputLink>
+                    </apex:column>
+                    
+                    <apex:column value="{!m.Name}" width="80" />
+                    <apex:column value="{!m.Titulo__c}" />
+                    <apex:column value="{!m.Jogo__c}" />
+                    <apex:column value="{!m.Status__c}" width="100"/> 
+                    <apex:column value="{!m.CreatedDate}" />
+                    <apex:column value="{!m.CreatedBy.Name}" />
+                </apex:pageBlockTable>
+                
+                
+                <apex:outputPanel rendered="{!mesaList.size == 0}">
+                    <apex:pageBlockSection collapsible="false" columns="1">
+                        <i class="no-records">Não há registros!</i>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                
+            </apex:outputPanel>
+            
+                    
+        </apex:pageBlock>
+        
+    </apex:form>
+    
+</apex:page>

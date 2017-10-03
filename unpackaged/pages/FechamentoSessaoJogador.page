@@ -1,0 +1,177 @@
+<apex:page controller="SessaoJogadorController" sidebar="false" title="Fechamento sessão jogador">
+    
+    <apex:includeScript value="https://code.jquery.com/jquery-3.0.0.min.js"/>
+    <script>
+    j$ = $.noConflict();
+    j$(document).ready( function($) {
+    });
+    
+    j$(document).on("change", "[id$=formaPagamento]",function(event) {
+        atualizarValoresSessao();
+    });
+    
+    j$(document).on("keydown", "[id$=inputFicha]",function(e) {
+        var key = e.charCode || e.keyCode || 0;
+        // allow backspace, tab, delete, enter, arrows, numbers and keypad numbers ONLY
+        // home, end, period, and numpad decimal
+        return (key == 8  || key == 9   || key == 13  || key == 46 || key == 110 || key == 190 ||
+                (key >= 35 && key <= 40) || (key >= 48 && key <= 57) || (key >= 96 && key <= 105));
+    });
+    </script>
+    
+    <style>
+        .div-main {
+        width: 100%;
+        display: inline-block;
+        }
+        .div-painel-a {
+        float: left;
+        width: 58%;
+          margin: 5px;
+        }
+        .div-painel-b {
+        float: left;
+        width: 40%;
+        margin: 5px;
+        }
+        .pbSubheader {
+        margin-top: 0px;
+        }
+        .valorTotal {
+        font-size: 14px;
+        font-weight: 500;
+        color: darkblue;
+        }
+        .tableLabel {
+        width: 20% !important;
+        }
+        .inputFicha {
+        	width: 100px;
+        }
+    </style>
+    
+    <apex:sectionHeader title="Caixa"
+                        description="Realize o fechamento da sessão do jogador, informando o número total de fichas devolvidas"
+                        subtitle="{!sessaoJogador.Cliente__r.FirstName} {!sessaoJogador.Cliente__r.LastName} [{!sessaoJogador.Name}]"/>
+    
+    <apex:form id="form">
+        
+        <apex:actionFunction name="atualizarValoresSessao" action="{!atualizarValores}" status="aguardeStatus" reRender="form"/>
+        
+        <apex:pageBlock mode="edit" title="Fechamento Sessão Jogador">
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton value="Finalizar" action="{!salvar}" reRender="form" status="aguardeStatus" onclick="if(!confirm('Você tem certeza ?')){return false};"/>
+                <apex:commandLink action="{!cancelar}" value="Cancelar" immediate="true" />
+                <apex:actionStatus id="aguardeStatus">
+                    <apex:facet name="start">
+                        <img src="/img/loading.gif" />
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlockButtons>
+            
+            <apex:outputPanel layout="block" styleClass="div-main">
+                <apex:outputPanel layout="block" styleClass="div-painel-a">
+                    
+                    <apex:pageBlockSection collapsible="false" title="{!sessaoJogador.Name}">
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection columns="2">
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.ValorTotal__c.Label}:"/>
+                            <apex:outputPanel styleClass="valorTotal" layout="block">
+                                <apex:outputField value="{!sessaoJogador.ValorTotal__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.ValorTotalPendente__c.Label}:"/>
+                            <apex:outputField value="{!sessaoJogador.ValorTotalPendente__c}" />
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.FichaDevolvida__c.Label}:"/>
+                            <apex:outputPanel styleClass="requiredInput" layout="block">
+                                <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                <apex:inputField value="{!sessaoJogador.FichaDevolvida__c}" id="inputFicha"
+                                                 styleClass="inputFicha" onblur="atualizarValoresSessao();" />
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.ValorTotalPago__c.Label}:"/>
+                            <apex:outputField value="{!sessaoJogador.ValorTotalPago__c}" />
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem rendered="{!!btnAtivo}"></apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem rendered="{!btnAtivo}" labelStyleClass="tableLabel">
+                            <apex:outputLabel value="Forma Pagamento:"/>
+                            <apex:inputField id="formaPagamento" value="{!sessaoJogador.FormaPagamento__c}" />
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.ValorCompra__c.Label}:"/>
+                            <apex:outputField value="{!sessaoJogador.ValorCompra__c}" />
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="Nome Cliente:"/>
+                            <apex:outputText value="{!sessaoJogador.Cliente__r.FirstName} {!sessaoJogador.Cliente__r.LastName}" />
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.Name.Label}:"/>
+                            <apex:outputText value="{!sessaoJogador.Name}" />
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.Status__c.Label}:"/>
+                            <apex:outputText value="{!sessaoJogador.Status__c}" />
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem labelStyleClass="tableLabel">
+                            <apex:outputLabel value="{!$ObjectType.SessaoCash__c.fields.CreatedDate.Label}:"/>
+                            <apex:outputField value="{!sessaoJogador.CreatedDate}" />
+                        </apex:pageBlockSectionItem>
+                        
+                    </apex:pageBlockSection>
+                    
+                </apex:outputPanel>
+                
+                <apex:outputPanel layout="block" styleClass="div-painel-b">
+                    
+                    <apex:pageBlockSection collapsible="false" title="Fichas Compradas">
+                    </apex:pageBlockSection>
+                    
+                    <apex:outputPanel id="msg-panel">
+                        <apex:pageMessages />
+                    </apex:outputPanel>
+                    
+                    <apex:pageBlockTable value="{!compraList}" var="com" align="center" rendered="{!compraList.size != 0}">
+                        <!--apex:column value="{!com.Name}" /-->
+                        <apex:column value="{!com.CreatedDate}" />
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="Vendedor"/>
+                            </apex:facet>
+                            <apex:outputText value="{!com.CreatedBy.Name}"/>
+                        </apex:column>
+                        <apex:column value="{!com.Mesa__c}" />
+                        <apex:column value="{!com.Status__c}" />
+                        <apex:column value="{!com.FormaPagamento__c}" />
+                        
+                        <apex:column value="{!com.Fichas__c}" />
+                        <apex:column value="{!com.Valor_Total__c}" />
+                        
+                    </apex:pageBlockTable>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            
+            
+        </apex:pageBlock>
+        
+    </apex:form>
+    
+</apex:page>

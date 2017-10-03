@@ -1,0 +1,77 @@
+<apex:page controller="JogadorFicha2Controller" title="Nova compra de fichas">
+    <apex:includeScript value="https://code.jquery.com/jquery-3.0.0.min.js"/>
+    <script>
+    j$ = $.noConflict();
+    j$(document).ready( function($) {
+        
+    });
+    
+    j$(document).on("change", "[id$=formaPagamento]", function(event) {
+        atualizarValores();
+    });
+    
+    j$(document).on("click", "[id$=finalizar]", function(event) {
+       j$(this).addClass('btnDisabled');
+    });
+    
+    </script>
+    
+    <style>
+        .valorTotal {
+        font-size: 14px;
+        font-weight: 500;
+        color: darkblue;
+        }
+    </style>
+    
+    <apex:sectionHeader title="Compra de Ficha"
+                        description="Para efetuar a compra informe a quantidade de fichas juntamento com a forma de pagamento"
+                        subtitle="{!jogadorMesa.jogador__r.FirstName} {!jogadorMesa.jogador__r.LastName}"/>
+    
+    <apex:form id="form">
+        
+        <apex:actionFunction name="atualizarValores" action="{!atualizarValores}" status="buscarStatus" reRender="form"/>
+        
+        <apex:pageBlock title="Nova Compra de Fichas" mode="edit">
+            
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton value="Finalizar Compra" id="finalizar" status="buscarStatus"
+                                    action="{!finalizar}" reRender="form" disabled="{!jogadorMesa.Status__c == 'Em Espera'}" />
+                <apex:commandLink action="{!cancelar}" value="Cancelar" immediate="true" />
+                <apex:actionStatus id="buscarStatus">
+                    <apex:facet name="start">
+                        <img src="/img/loading.gif" />
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlockButtons>
+            
+            <apex:outputPanel >
+                <apex:pageMessages />
+            </apex:outputPanel>
+            
+            <apex:pageBlockSection columns="2" title="Informações">
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$ObjectType.CompraFicha__c.fields.Valor_Total__c.Label}:"/>
+                    <apex:outputPanel styleClass="valorTotal" layout="block">
+                        <apex:outputField value="{!compraFicha.Valor_Total__c}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:outputField value="{!jogadorMesa.SessaoJogador__c }" />
+                
+                <apex:inputField value="{!compraFicha.Fichas__c}" onblur="atualizarValores();"/>
+                <apex:outputField value="{!jogadorMesa.Jogador__c }" />
+                
+                <apex:inputField value="{!compraFicha.FormaPagamento__c}" required="true" id="formaPagamento"/>
+                <apex:outputField value="{!jogadorMesa.Mesa__c }" />
+                
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:outputField value="{!jogadorMesa.DataAtivacao__c }" />
+                
+            </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+       
+    </apex:form>
+</apex:page>

@@ -1,0 +1,160 @@
+<apex:page controller="JogadorMesaController" title="Mesas abertas e fila de espera">
+    
+    <style>
+        .div-main {
+        width: 100%;
+        display: inline-block;
+        }
+        .div-painel-a {
+        float: left;
+        width: 38%;
+        margin: 0px;
+        }
+        .div-painel-b {
+        float: right;
+        width: 58%;
+        margin: 0px;
+        }
+        .bPageBlock .detailList .labelCol {
+        width: 25%;
+        }
+        .pbSubheader {
+        margin-top: 0px;
+        }
+        .actionLink {
+        color: #015ba7 !important;
+        text-decoration: none;
+        font-weight: normal;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-right: 1px solid #BBB;
+        }
+        .selectAction {
+        float: right;
+        font-size: 13px !important;
+        }
+        .div-painel {
+        min-height: 250px;
+        max-height: 400px;
+        overflow-y: scroll;
+        background: #EEE;
+        }
+    </style>
+    
+    <apex:sectionHeader title="Mesa&Fila"
+                        description="Selecione uma mesa para listar os jogadores"
+                        subtitle="Mesas abertas"/>
+    
+    <apex:form id="form">    
+        
+        <apex:pageBlock mode="detail" title="{!IF(status == 'Ativo', 'Jogador Mesa', 'Fila de Espera')}">
+            <apex:pageBlockButtons location="both">
+               
+                <apex:selectList size="1" value="{!status}" styleClass="selectAction"> 
+                    <apex:actionSupport action="{!selectMesa}" event="onchange" status="buscarStatus" reRender="form" />
+                    <apex:selectOptions value="{!tipoSelectOption}"></apex:selectOptions>
+                </apex:selectList>
+                
+                <apex:selectList size="1" value="{!mesaId}" styleClass="selectAction">
+                    <apex:actionSupport action="{!selectMesa}" event="onchange" status="buscarStatus" reRender="form" />
+                    <apex:selectOptions value="{!mesaSelectOption}"></apex:selectOptions>
+                </apex:selectList>
+                
+                <apex:commandLink value="Adicionar Novo Jogador?" action="{!$Page.Jogador}?sfdc.tabName=01r61000000ho8J" />
+                
+                <apex:actionStatus id="buscarStatus">
+                    <apex:facet name="start">
+                        <img src="/img/loading.gif" />
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlockButtons>
+            
+            <apex:outputPanel layout="block" styleClass="div-main">
+                <apex:outputPanel layout="block" styleClass="div-painel-a">
+                    <apex:outputPanel layout="block" >
+                        
+                        <apex:pageBlockSection columns="1">
+                            <apex:pageBlockSectionItem />
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="Listar: "/>
+                                <apex:outputText value="{!status}" />
+                            </apex:pageBlockSectionItem>
+                           
+                            <apex:pageBlockSectionItem rendered="{!mesa != null}">
+                                <apex:outputLabel value="Mesa"/>
+                                <apex:outputLink value="{!URLFOR($Action.Mesa__c.View, mesa.Id)}"
+                                                 target="_blank">
+                                    <apex:outputText value="{!mesa.Name}"/>
+                                </apex:outputLink>   
+                            </apex:pageBlockSectionItem>
+                            <apex:outputField value="{!mesa.Titulo__c}" rendered="{!mesa != null}"/>
+                            <apex:outputField value="{!mesa.Jogo__c}" rendered="{!mesa != null}"/>
+							<apex:outputField value="{!mesa.TotalVagas__c}" rendered="{!mesa != null}"/>
+                            <apex:outputField value="{!mesa.ValorFrente__c}" rendered="{!mesa != null}"/>
+                            <apex:outputField value="{!mesa.Observacoes__c}" rendered="{!mesa != null}"/>
+                            
+                        </apex:pageBlockSection>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                
+                <apex:outputPanel layout="block" styleClass="div-painel-b">
+                    <apex:pageBlockSection collapsible="false" title="Jogadores da {!IF(status == 'Ativo', 'Mesa', 'Fila de Espera')}">
+                    </apex:pageBlockSection>
+                    <apex:variable value="1" var="num"/>
+                    
+                    <apex:outputPanel layout="block"  styleClass="div-painel">
+                        <apex:outputPanel id="msg-panel">
+                            <apex:pageMessages />
+                        </apex:outputPanel>
+                        
+                        <apex:pageBlockTable value="{!jogadorMesaList}"
+                                             var="jM" align="center" id="tableJog">
+                            
+                            <!--apex:column width="15">
+<apex:facet name="header">
+<apex:outputLabel value="Posição"/>
+</apex:facet>
+<apex:outputLabel >{!num}º</apex:outputLabel>
+
+<apex:variable var="num" value="{!VALUE(num) + 1}"/>
+</apex:column-->
+                            
+                            <apex:column width="200">
+                                <apex:facet name="header">
+                                    <apex:outputLabel value="Ações: O que deseja fazer?"/>
+                                </apex:facet>
+                                
+                                <apex:outputLink styleClass="actionLink" rendered="{!status == 'Ativo'}"
+                                                 value="{!$Page.JogadorCompraFicha}?sfdc.tabName=01r61000000ho8J&Id={!jM.Id}">Comprar Ficha</apex:outputLink>
+                                
+                                <apex:commandLink value="Entrar Mesa" rendered="{!status == 'Em Espera'}"
+                                                  action="{!actionJogador}" styleClass="actionLink"
+                                                  onclick="if(!confirm('Deseja adicionar o jogador mesa ?')) { return false };">
+                                    <apex:param name="Id" value="{!jM.Id}" />
+                                    <apex:param name="action" value="1" />
+                                </apex:commandLink>
+                                
+                                <apex:commandLink value="Sair {!IF(status =='Ativo', 'Mesa', 'Fila')}"
+                                                  action="{!actionJogador}" styleClass="actionLink"
+                                                  onclick="if(!confirm('Você tem certeza que deseja remover o jogador da {!IF(status =='Ativo', 'Mesa', 'Fila de Espera')}?')){return false};">
+                                    <apex:param name="Id" value="{!jM.Id}" />
+                                    <apex:param name="action" value="0" />
+                                </apex:commandLink>
+                            </apex:column>
+                            
+                            <apex:column value="{!jM.Jogador__c}" />
+                            <apex:column value="{!jM.Status__c}" />
+                            <apex:column value="{!jM.DataAtivacao__c}" />
+                            <apex:column value="{!jM.CreatedDate}" />
+                        </apex:pageBlockTable>
+                        
+                        <apex:outputPanel rendered="{!jogadorMesaList.size == 0}"><i class="no-records">Não há registros!</i></apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                 </apex:outputPanel>
+                
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>

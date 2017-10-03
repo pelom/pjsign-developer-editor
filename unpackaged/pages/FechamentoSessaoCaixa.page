@@ -1,0 +1,74 @@
+<apex:page extensions="SessaoCaixaController" title="Fechamento sessão caixa"
+           standardController="SessaoCaixa__c" action="{!fechamentoSessaoCaixa}">
+    
+    <style>
+        .div-painel {
+        max-height: 300px;
+        overflow-y: scroll;
+        background: #EEE;
+        }
+    </style>
+    
+    <apex:sectionHeader title="Caixa"
+                        description="Para realizar o fechamento do caixa nenhuma mesa ou jogador deve está ativo"
+                        subtitle="{!sessaoCaixa.name}"/>
+    
+    <apex:form id="form">
+        
+        <apex:outputPanel layout="block">
+            <div class="ptBreadcrumb">&nbsp;«&nbsp;
+                <apex:outputLink value="../{!sessaoCaixaId}">Volta à página: Sessão Caixa</apex:outputLink>
+            </div>
+        </apex:outputPanel>
+        <br/>
+        <apex:pageBlock title="Fechamento de sessão caixa">	
+            
+            <apex:outputPanel id="msg-panel">
+                <apex:pageMessages />
+            </apex:outputPanel>
+            
+            <apex:pageBlockSection ></apex:pageBlockSection>
+            
+            <apex:pageBlockSection collapsible="false" title="Sessões Jogador Abertas">
+            </apex:pageBlockSection>
+            
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                
+                <apex:pageBlockTable value="{!jogSessaoList}" var="ses" align="center" rendered="{!jogSessaoList != null && jogSessaoList.size != 0}">
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Nome do Cliente"/>
+                        </apex:facet>
+                        <apex:outputLink value="../{!ses.Cliente__c}">{!ses.Cliente__r.FirstName} {!ses.Cliente__r.LastName}</apex:outputLink>
+                    </apex:column>
+                    
+                    <apex:column value="{!ses.Status__c}" />
+                    <apex:column value="{!ses.Name}" />
+                    <apex:column value="{!ses.CreatedDate}" />
+                </apex:pageBlockTable>
+                
+                <apex:outputPanel rendered="{!jogSessaoList == null || jogSessaoList.size == 0}">
+                    <apex:pageBlockSection collapsible="false" columns="1">
+                        <i class="no-records">Não há registros!</i>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            
+            <apex:pageBlockSection collapsible="false" title="Mesas Abertas">
+            </apex:pageBlockSection>
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!mesaList}" var="me" align="center" rendered="{!mesaList != null && mesaList.size != 0}">
+                    <apex:column value="{!me.Name}" />
+                    <apex:column value="{!me.Titulo__c}" />
+                    <apex:column value="{!me.Jogo__c}" />
+                    <apex:column value="{!me.Status__c}" />
+                    <apex:column value="{!me.CreatedDate}" />
+                    
+                </apex:pageBlockTable>
+                <apex:outputPanel rendered="{!mesaList.size == 0}"><i class="no-records">Não há registros!</i></apex:outputPanel>
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+    </apex:form>
+    
+</apex:page>

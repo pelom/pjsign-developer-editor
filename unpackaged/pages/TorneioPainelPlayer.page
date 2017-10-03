@@ -1,0 +1,70 @@
+<apex:page standardController="TorneioEvento__c" showHeader="{!isHeader}" title="Painel controle evento"
+           extensions="TorneioPainelController" action="{!inicializar}" >
+    
+    <apex:form id="form">
+    	<apex:pageBlock title="{!torneioEvento.Torneio__r.Titulo__c} - {!torneioEvento.Name} [{!torneioEvento.Status__c}]">
+        	
+            <apex:pageBlockButtons location="top">
+                
+                <apex:selectList size="1" value="{!torneioEvento.Nivel__c}" disabled="{!torneioEvento.Status__c == 'Em Andamento'}">
+                    <apex:selectOptions value="{!nivelOptionList}"></apex:selectOptions>
+                    <apex:actionSupport action="{!alterarNivel}" event="onchange" reRender="form" status="status" />
+                </apex:selectList>
+                
+                <apex:commandButton value="Iniciar" action="{!btnIniciar}"
+                                    rendered="{!isBtnIniciar}" reRender="form" status="status" />
+               
+                <apex:commandButton value="Pausar" action="{!btnPausar}"
+                                    rendered="{!isBtnPausar}" reRender="form" status="status"/>
+                
+                <apex:commandLink value="Telão" target="_blank" action="{!telao}" />
+                <apex:actionStatus id="status">
+                    <apex:facet name="start">
+                        <img src="/img/loading.gif" />
+                    </apex:facet>
+                </apex:actionStatus>
+                
+            </apex:pageBlockButtons>
+            
+            <apex:pageMessages />
+            <apex:pageBlockSection columns="2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Valor Small"/>
+                    <apex:outputText value="{!torneioNivel.ValorSmall__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Tempo"/>
+                    <apex:outputText value="{!tempoString}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Valor Big"/>
+                    <apex:outputText value="{!torneioNivel.ValorBig__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Tempo Restante"/>
+                    <apex:outputText value="{!tempoLevel} Segundos" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Valor Ante"/>
+                    <apex:outputText value="{!torneioNivel.ValorAnte__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Média Stack"/>
+                    <apex:outputText value="{!mediaStack}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Próximo Nível"/>
+                    <apex:outputField value="{!torneioNivel.ProximoNivel__c}" />
+                </apex:pageBlockSectionItem>
+                
+                
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

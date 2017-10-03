@@ -1,0 +1,23 @@
+<apex:component >
+    <apex:attribute name="sessaoCaixaList" description="Sessao caixa aberta"
+                    type="SessaoCaixa__c[]" 
+                    required="true"/>
+    
+    <apex:pageBlock rendered="{!sessaoCaixaList.size != 0}">
+        <apex:pageBlockSection collapsible="false" title="Sessão Caixa">
+        </apex:pageBlockSection>
+        <apex:pageBlockSection ></apex:pageBlockSection>
+        <apex:pageBlockTable value="{!sessaoCaixaList}" var="ses" align="center" >
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:outputLabel value="Código"/>
+                </apex:facet>
+                <apex:outputLink styleClass="actionLink" target="_blank" value="/{!ses.Id}">{!ses.Name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!ses.Status__c}" /> 
+            <apex:column value="{!ses.CreatedDate}" />
+            <apex:column value="{!ses.CreatedBy.Name}" />
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    
+</apex:component>

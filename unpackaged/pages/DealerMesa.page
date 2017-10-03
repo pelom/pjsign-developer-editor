@@ -1,0 +1,64 @@
+<apex:page controller="DealerController" title="Dealer mesa">
+    
+    <apex:includeScript value="https://code.jquery.com/jquery-3.0.0.min.js"/>
+    
+    <script>
+    j$ = $.noConflict();
+    j$(document).ready( function($) {
+        
+        
+    });
+    </script>
+    
+    <apex:sectionHeader title="Dealers"
+                        description="Selecione uma mesa para Registrar Dealer."                        
+                        subtitle="{!dSessao.Dealer__r.FirstName} {!dSessao.Dealer__r.LastName}"/>
+    
+    <apex:form id="form">
+        
+        <apex:pageBlock title="Registrar Dealer Mesa" mode="edit">
+            
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton value="Adicionar" action="{!addDealerMesa}" reRender="form" disabled="{!dSessao == null}" />
+                <apex:commandLink action="{!cancelar}" value="Cancelar" immediate="true"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection id="compra-area" columns="1" title="Informações">
+                
+                <apex:outputPanel id="msg-panel">
+                    <apex:pageMessages />
+                </apex:outputPanel>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Nome do Dealer: "/>
+                    <apex:outputText value="{!dSessao.Dealer__r.FirstName} {!dSessao.Dealer__r.LastName}"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Mesa Aberta: "/>
+                    <apex:selectList size="1" multiselect="false" value="{!dMesa.Mesa__c}" required="true">
+                        <apex:selectOptions value="{!mesaSelectOption}"></apex:selectOptions>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$ObjectType.DealerMesa__c.fields.DataEntrada__c.Label}:"/>
+                    <apex:inputField value="{!dMesa.DataEntrada__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$ObjectType.DealerMesa__c.fields.DataSaida__c.Label}:"/>
+                    <apex:inputField value="{!dMesa.DataSaida__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$ObjectType.DealerMesa__c.fields.ValorCapile__c.Label}:"/>
+                    <apex:inputField value="{!dMesa.ValorCapile__c}" required="true" />
+                </apex:pageBlockSectionItem>
+                
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+    </apex:form>
+    
+</apex:page>

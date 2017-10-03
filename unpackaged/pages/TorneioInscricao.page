@@ -1,0 +1,378 @@
+<apex:page controller="TorneioInscricaoController" title="Torneio Inscrição">
+    
+    <apex:includeScript value="https://code.jquery.com/jquery-3.0.0.min.js"/>
+    
+    <style>
+        .actionLink {
+        color: #015ba7 !important;
+        text-decoration: none;
+        font-weight: normal;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-right: 1px solid #BBB;
+        
+        }
+        .headerPainel {
+        margin: 5px;
+        }
+        .inputSearch {
+        line-height: 20px;
+        font-size: 14px;
+        }
+        .div-painel {
+        max-height: 250px;
+        overflow-y: scroll;
+        background: #EEE;
+        }
+        .block-right {
+        float: right;
+        }
+        .valorTotal {
+        font-size: 14px;
+        font-weight: 500;
+        color: darkblue;
+        }
+        .div-btn-painel {
+        width: 80%;
+        text-align: center;
+        padding-bottom: 10px;
+        padding-top: 20px;
+        }
+    </style>
+    
+    <script>
+    j$ = $.noConflict();
+    j$(document).ready( function($) {
+        j$('[id$=area-result]').hide();
+    });
+    
+    function onComplBusca() {
+        j$('[id$=area-form]').fadeOut();
+        j$('[id$=area-result]').fadeIn("slow");
+    }
+    
+    function onComplInscricao() {
+        j$('[id$=area-form]').fadeIn("slow");
+        j$('[id$=area-result]').fadeOut();
+    }
+    
+    j$(document).on("keypress", "[id$=textoChave]",function(event) {
+        
+        if(event.which == 13) {
+            event.preventDefault();
+            
+            if(j$(this).val().length > 0) {
+                j$('[id$=btnBuscar]').click();
+            }
+        }
+    });
+    
+    </script>
+    
+    <apex:sectionHeader title="Torneio Inscrição"
+                        description="Encontre jogadores pesquisando pelo Nome ou Sobrenome"
+                        subtitle="Pesquisar Jogador"/>
+    
+    <apex:form id="form">
+        
+        <apex:outputPanel layout="block" styleClass="headerPainel">
+            <apex:inputText value="{!textoChave}" id="textoChave" size="80" styleClass="inputSearch"
+                            html-placeholder="Pesquise por Nome, Sobrenome, Email ou CPF"/>
+            &nbsp;
+            <apex:commandButton value="Buscar" action="{!buscar}"
+                                reRender="area-result" status="buscarStatus"
+                                id="btnBuscar" oncomplete="onComplBusca();" />
+            <apex:commandLink action="/003/e?&RecordType=0126100000074nA&accid={!accClube.Id}" value="Novo Jogador" />
+            &nbsp;
+            <apex:actionStatus id="buscarStatus">
+                <apex:facet name="start">
+                    <apex:outputPanel >
+                        <img src="/img/loading.gif" />&nbsp;
+                        <apex:outputLabel value="Carregando..." />
+                    </apex:outputPanel>
+                </apex:facet>
+            </apex:actionStatus>
+        </apex:outputPanel>
+        
+        <br/>
+        
+        <apex:pageBlock id="area-result">
+            <apex:pageBlockSection collapsible="false" title="Resultados da pesquisar">
+            </apex:pageBlockSection>
+            
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!jogadorList}" var="jog" align="center">
+                    <apex:column width="280">
+                        <apex:facet name="header" >
+                            <apex:outputLabel value="Ações: O que deseja fazer?"/>
+                        </apex:facet>
+                        
+                        <!--apex:outputLink rendered="{!sessaoCaixa != null}" styleClass="actionLink"
+                                         value="{!$Page.JogadorMesa}?sfdc.tabName=01r610000002O2U&Id={!jog.Id}">
+                            Adicionar Mesa</apex:outputLink-->
+                        
+                        <apex:commandLink styleClass="actionLink" action="{!selectJogador}"
+                                          value="Inscrição" reRender="form"
+                                          status="buscarStatus" oncomplete="onComplInscricao();">
+                            <apex:param name="jogId" value="{!jog.Id}"/>
+                        </apex:commandLink>
+                        
+                        <apex:outputLink styleClass="actionLink"
+                                         value="/{!jog.Id}/e">
+                            Editar</apex:outputLink>
+                    </apex:column>
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Nome"/>
+                        </apex:facet>
+                        <apex:outputLink value="../{!jog.Id}" target="_blank">
+                            {!jog.FirstName} {!jog.LastName}</apex:outputLink>
+                    </apex:column>
+                    <apex:column value="{!jog.MobilePhone}" />
+                    <apex:column value="{!jog.Email}" />
+                </apex:pageBlockTable>
+                <apex:outputPanel rendered="{!jogadorList == null || jogadorList.size == 0}">
+                    <apex:pageBlockSection collapsible="false" columns="1">
+                        <i class="no-records">Não há registros!</i>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            
+            
+        </apex:pageBlock>
+        
+        <apex:pageBlock id="area-form" rendered="{!inscricao != null}"
+                        title="Inscrição - {!jogador.FirstName} {!jogador.LastName}">
+            
+            <apex:pageBlockButtons location="top">
+                <!--apex:commandButton value="Add ByIn" rendered="{!isByIn}"
+					action="{!addByIn}" reRender="area-form" status="buscarStatus" /-->
+                
+                <apex:commandButton value="Fazer Rebuy" rendered="{!isRebuy}" styleClass="block-right"
+                                    action="{!addRebuy}" reRender="area-form" status="formStatus"/>
+                
+                <apex:commandButton value="Fazer Add On" rendered="{!isAddOn}" styleClass="block-right"
+                                    action="{!addAddOn}" reRender="area-form" status="formStatus"/>
+                
+                <apex:actionStatus id="formStatus">
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <img src="/img/loading.gif" />&nbsp;
+                            <apex:outputLabel value="Carregando..." />
+                        </apex:outputPanel>
+                        
+                    </apex:facet>
+                </apex:actionStatus>
+                
+            </apex:pageBlockButtons>
+            
+            <apex:pageMessages />
+            <br/>
+            <apex:pageBlockSection columns="2" rendered="{!tCompra.ValorTotal__c != null}">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Valor Total"/>
+                    <apex:outputPanel styleClass="valorTotal" layout="block">
+                        <apex:outputField value="{!tCompra.ValorTotal__c}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Forma Pagamento"/>
+                    <apex:inputField value="{!tCompra.FormaPagamento__c}">
+                    	<apex:actionSupport action="{!formaPagamento}" event="onchange"
+                                            reRender="area-form" status="formStatus" />
+                    </apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection columns="2" rendered="{!inscricao.Id != null}">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Número da Inscrição"/>
+                    <apex:outputField value="{!inscricao.Name}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Torneio"/>
+                    <apex:outputField value="{!inscricao.Torneio__r.Titulo__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Data da Inscrição"/>
+                    <apex:outputField value="{!inscricao.DataInscricao__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Evento"/>
+                    <apex:outputField value="{!inscricao.Torneio_Evento__r.Name}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Jogador"/>
+                    <apex:outputText value="{!jogador.FirstName} {!jogador.LastName}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Status Jogador"/>
+                    <apex:outputField value="{!inscricao.StatusPlayer__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem />
+                <apex:pageBlockSectionItem />
+                
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection collapsible="false" title="Informações da compra">
+            </apex:pageBlockSection>
+            
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!comprasList}" var="co" align="center">
+                    <apex:column value="{!co.Tipo__c}" />
+                    <apex:column value="{!co.Status__c}" />
+                    <apex:column value="{!co.FormaPagamento__c}" />
+                    <!--apex:column value="{!co.CreatedById}" /-->
+                    <apex:column value="{!co.Fichas__c}" />
+                    <apex:column value="{!co.Valor__c}" />
+                    <apex:column value="{!co.ValorTotal__c}" />
+                    
+                </apex:pageBlockTable>
+            </apex:outputPanel>
+            
+            <apex:outputPanel layout="block"  styleClass="div-btn-painel">
+                <apex:commandButton value="Fazer Inscrição" rendered="{!isInscricao}"
+                                    action="{!fazerInscricao}" reRender="area-form, torneio-form" status="formStatus"/>
+                
+                <apex:commandButton value="Salvar Alterações"
+                                    rendered="{!tCompra.ValorTotal__c != null && inscricao.Id != null}"
+                                    action="{!salvar}" reRender="area-form" status="formStatus"/>
+                
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+        <apex:pageBlock id="torneio-form" title="Torneio - {!torneio.Titulo__c}">
+            
+            <apex:pageBlockButtons location="top">
+                <apex:outputPanel styleClass="block-right">
+                    
+                    <apex:actionStatus id="torneioStatus">
+                        <apex:facet name="start">
+                            <apex:outputPanel >
+                                <img src="/img/loading.gif" />
+                                &nbsp;
+                                <apex:outputText value="Carregando..." />
+                            </apex:outputPanel>
+                        </apex:facet>
+                    </apex:actionStatus>
+                    
+                    &nbsp;
+                    
+                    <apex:selectList size="1" value="{!torSelect}">
+                        <apex:selectOptions value="{!torneioSelect}"></apex:selectOptions>
+                        <apex:actionSupport event="onchange" action="{!selectTorneio}"
+                                            reRender="torneio-form, area-form" status="torneioStatus"/>
+                    </apex:selectList>
+                    
+                    <apex:selectList size="1" value="{!evtSelect}">
+                        <apex:selectOption itemLabel="--Nenhum--" itemValue="" />
+                        <apex:selectOptions value="{!eventoSelect}"></apex:selectOptions>
+                        <apex:actionSupport event="onchange" action="{!selectEvento}"
+                                            reRender="torneio-form, area-form" status="torneioStatus"/>
+                    </apex:selectList>
+                </apex:outputPanel>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection collapsible="false" title="Informações do torneio">
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection columns="2">
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Evento"/>
+                    <apex:outputField value="{!evento.Name}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Valor Buy In"/>
+                    <apex:outputField value="{!torneio.ValorBuyIn__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Data evento"/>
+                    <apex:outputField value="{!evento.Data__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Valor Rebuy In"/>
+                    <apex:outputField value="{!torneio.ValorRebuy__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Status evento"/>
+                    <apex:outputField value="{!evento.Status__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Valor Add On"/>
+                    <apex:outputField value="{!torneio.ValorAddOn__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Nível evento"/>
+                    <apex:outputField value="{!evento.Nivel__r.Name}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Valor Taxa"/>
+                    <apex:outputField value="{!torneio.ValorTaxa__c}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Tempo Blinds"/>
+                    <apex:outputText value="{!evento.Nivel__r.DuracaoBlinds__c} Minutos" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem />
+                
+                <apex:outputField value="{!torneio.Descricao__c}" />
+               
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection collapsible="false" title="Inscrições do torneio">
+            </apex:pageBlockSection>
+            <apex:outputPanel layout="block"  styleClass="div-painel">
+                <apex:pageBlockTable value="{!inscricaoList}" var="ins" align="center">
+                    
+                    <apex:column width="100">
+                        <apex:facet name="header" >
+                            <apex:outputLabel value="Ações"/>
+                        </apex:facet>
+                        
+                        <apex:commandLink styleClass="actionLink" action="{!selectJogador}"
+                                          value="Inscrição" reRender="form"
+                                          status="torneioStatus" oncomplete="onComplInscricao();">
+                            <apex:param name="jogId" value="{!ins.Jogador__c}"/>
+                        </apex:commandLink>
+                        
+                    </apex:column>
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Nome"/>
+                        </apex:facet>
+                        <apex:outputLink value="../{!ins.Jogador__c}" target="_blank">
+                            {!ins.Jogador__r.FirstName} {!ins.Jogador__r.LastName}</apex:outputLink>
+                    </apex:column>
+                    <apex:column value="{!ins.StatusPlayer__c}" />
+                    
+                    <apex:column value="{!ins.Name}" />
+                    <apex:column value="{!ins.Status__c}" />
+                    <apex:column value="{!ins.DataInscricao__c}" />
+                    
+                </apex:pageBlockTable>
+            </apex:outputPanel>
+            
+        </apex:pageBlock>
+        
+        
+    </apex:form>
+</apex:page>

@@ -1,0 +1,521 @@
+<apex:page standardController="TorneioEvento__c" showHeader="false" extensions="TorneioPainelController">
+    
+    <apex:includeScript value="https://code.jquery.com/jquery-3.0.0.min.js"/>
+    <apex:includeScript value="{!$Resource.unslider}"/>
+    
+    <apex:stylesheet value="{!$Resource.unslidercss}"/>
+    
+    <style>
+        body, td {
+        color: #FFF;
+        background-color: #544E43;
+        }
+        .hp-titulo {
+        font-size: 3.5vw;
+        }
+        .hp-subtitulo {
+        font-size: 2.0vw;
+        }
+        .torrePainel {
+        width: 25%;
+        float: left;
+        color: #FFF;
+        text-align: center;
+        font-size: 1.5vw;
+        font-weight: bold;
+        text-shadow: 2px -2px 10px #4B4250;
+        }
+        .torreCenter {
+        width: 50%;
+        float: left;
+        margin-top: 2%;
+        color: yellow;
+        text-align: center;
+        font-size: 12vw;
+        font-weight: bold;
+        }
+        .torreCenter span {
+        padding: 10px;
+        display: inline-block;
+        text-shadow: 2px -2px 10px #4B4250;
+        width: 95%;
+        }
+        .timePainel {
+        width: 100%;
+        margin-top: 1%;
+        border-radius: 20px;
+        border: 1px solid #000;
+        /*background-color: #000A97;*/
+        background: -webkit-radial-gradient(50% 50%, ellipse cover, rgb(54, 144, 240) 0%, rgb(0, 0, 186) 84%);
+        box-shadow: rgba(0, 0, 0, 0.74902) 10px 10px 25px -6px;
+        }
+        .timePainel-inter {
+        background: -webkit-radial-gradient(50% 50%, ellipse cover, rgb(4, 68, 20) 0%, #009933 84%);
+        }
+        .timePainelLabel {
+        width: 85%;
+        margin-top: 10%;
+        font-size: 2.0vw;
+        margin-left: 8%;
+        font-weight: normal;
+        }
+        .labelPainel {
+        font-size: 4vw;
+        color: #FFF;
+        }
+        .labelPainelProx {
+        font-size: 2.5vw;
+        color: #FFF;
+        background: -webkit-radial-gradient(50% 50%, ellipse cover, rgb(255, 0, 0) 0%, rgb(255, 116, 0) 100%);
+        }
+        .gripPainelPremio td {
+        background-color: transparent !important;
+        text-align: right;
+        padding: 12px;
+        }
+        .text-left {
+        width: 60px;
+        text-align: center;
+        display: inline-block;
+        font-weight: normal;
+        background-color: #FFF;
+        color: #000;
+        border-radius: 10px;
+        border: 1px solid #000;
+        text-shadow: none;
+        }
+        .spanNivel {
+        font-size: 2.5vw;
+        }
+        .headerPainel {
+        width: 100%;
+        text-align: center;
+        margin-top: 2%;
+        font-weight: bold;
+        text-shadow: 2px -2px 10px #4B4250;
+        text-decoration: underline;
+        }</style>
+    
+    <script>
+    $(document).ready(function() {
+        
+        $('.my-slider').unslider({
+            arrows: false,
+            animation: 'fade',
+            delay: 10000,
+            animateHeight: true,
+            autoplay: true 
+        });
+       
+        (function($) {
+            $.extend({    
+                APP : {
+                    formatTimer : function(a) {
+                        if (a < 10) {
+                            a = '0' + a;
+                        }                              
+                        return a;
+                    },
+                    startTimer : function(dir) {
+                        var a;
+                        // save type
+                        $.APP.dir = dir;
+                        
+                        // get current date
+                        $.APP.d1 = new Date();
+                        
+                        switch($.APP.state) {
+                            case 'pause' :
+                                // resume timer
+                                // get current timestamp (for calculations) and
+                                // substract time difference between pause and now
+                                $.APP.t1 = $.APP.d1.getTime() - $.APP.td;                            
+                                
+                                break;
+                            default :
+                                // get current timestamp (for calculations)
+                                $.APP.t1 = $.APP.d1.getTime(); 
+                                
+                                // if countdown add ms based on seconds in textfield
+                                if ($.APP.dir === 'cd') {
+                                    $.APP.t1 += parseInt($('#cd_seconds').val())*1000;
+                                }    
+                                
+                                break;
+                        }
+                        // reset state
+                        $.APP.state = 'alive';   
+                        $('#' + $.APP.dir + '_status').html('Running');
+                        
+                        // start loop
+                        $.APP.loopTimer();
+                        
+                    },
+                    
+                    pauseTimer : function() {
+                        
+                        // save timestamp of pause
+                        $.APP.dp = new Date();
+                        $.APP.tp = $.APP.dp.getTime();
+                        
+                        // save elapsed time (until pause)
+                        $.APP.td = $.APP.tp - $.APP.t1;
+                        
+                        // change button value
+                        $('#' + $.APP.dir + '_start').val('Resume');
+                        
+                        // set state
+                        $.APP.state = 'pause';
+                        $('#' + $.APP.dir + '_status').html('Paused');
+                        
+                    },
+                    
+                    stopTimer : function() {
+                        
+                        // change button value
+                        $('#' + $.APP.dir + '_start').val('Restart');                    
+                        
+                        // set state
+                        $.APP.state = 'stop';
+                        $('#' + $.APP.dir + '_status').html('Stopped');
+                        
+                    },
+                    
+                    resetTimer : function() {
+                        
+                        // reset display
+                        $('#' + $.APP.dir + '_ms,#' + $.APP.dir + '_s,#' + $.APP.dir + '_m,#' + $.APP.dir + '_h').html('00');                 
+                        
+                        // change button value
+                        $('#' + $.APP.dir + '_start').val('Start');                    
+                        
+                        // set state
+                        $.APP.state = 'reset';  
+                        $('#' + $.APP.dir + '_status').html('Reset & Idle again');
+                        
+                    },
+                    
+                    endTimer : function(callback) {
+                        
+                        // change button value
+                        $('#' + $.APP.dir + '_start').val('Restart');
+                        
+                        // set state
+                        $.APP.state = 'end';
+                        
+                        // invoke callback
+                        if (typeof callback === 'function') {
+                            callback();
+                        }    
+                        
+                    },    
+                    
+                    loopTimer : function() {
+                        
+                        var td;
+                        var d2,t2;
+                        
+                        var ms = 0;
+                        var s  = 0;
+                        var m  = 0;
+                        var h  = 0;
+                        
+                        if ($.APP.state === 'alive') {
+                            
+                            // get current date and convert it into 
+                            // timestamp for calculations
+                            d2 = new Date();
+                            t2 = d2.getTime();   
+                            
+                            // calculate time difference between
+                            // initial and current timestamp
+                            if ($.APP.dir === 'sw') {
+                                td = t2 - $.APP.t1;
+                                // reversed if countdown
+                            } else {
+                                td = $.APP.t1 - t2;
+                                if (td <= 0) {
+                                    // if time difference is 0 end countdown
+                                    $.APP.endTimer(function(){
+                                        $.APP.resetTimer();
+                                        $('#' + $.APP.dir + '_status').html('Ended & Reset');
+                                    });
+                                }    
+                            }    
+                            
+                            // calculate milliseconds
+                            ms = td%1000;
+                            if (ms < 1) {
+                                ms = 0;
+                            } else {    
+                                // calculate seconds
+                                s = (td-ms)/1000;
+                                if (s < 1) {
+                                    s = 0;
+                                } else {
+                                    // calculate minutes   
+                                    var m = (s-(s%60))/60;
+                                    if (m < 1) {
+                                        m = 0;
+                                    } else {
+                                        // calculate hours
+                                        var h = (m-(m%60))/60;
+                                        if (h < 1) {
+                                            h = 0
+                                        }                             
+                                    }    
+                                }
+                            }
+                            
+                            // substract elapsed minutes & hours
+                            ms = Math.round(ms/100);
+                            s  = s-(m*60);
+                            
+                            console.log('Result: '  + (ms/100) + ' ' + Math.round(ms/100) + ' ' + ms + ' ' + s);
+                            
+                            m  = m-(h*60);                                
+                            
+                            if(s == 1 && m == 0 && h ==0) {
+                                $.APP.stopTimer();
+                            }
+                            
+                            if(s == 1) {
+                                updateTimeSeg();
+                            }
+                            
+                            var tempo = 
+                                $.APP.formatTimer(h) + ':' + 
+                                $.APP.formatTimer(m) + ':' + $.APP.formatTimer(s);
+                            $('[id$=tempo]').html(tempo); 
+                            
+                            // update display
+                            //$('#' + $.APP.dir + '_ms').html($.APP.formatTimer(ms));
+                            //$('#' + $.APP.dir + '_s').html($.APP.formatTimer(s));
+                            //$('#' + $.APP.dir + '_m').html($.APP.formatTimer(m));
+                            //$('#' + $.APP.dir + '_h').html($.APP.formatTimer(h));
+                            
+                            // loop
+                            $.APP.t = setTimeout($.APP.loopTimer, 999);
+                            
+                        } else {
+                            
+                            // kill loop
+                            clearTimeout($.APP.t);
+                            return true;
+                            
+                        }  
+                        
+                    }
+                    
+                }    
+                
+            });
+            
+           controleTime();
+            
+        })(jQuery);
+        
+    });
+    
+    function controleTime() {
+        var status =  $('[id$=statusEvento]').val();
+        
+        if(status == 'Em Andamento' && $.APP.state != 'alive') {
+            //$.APP.startTimer('sw');
+            $.APP.startTimer('cd');
+            
+            //$.APP.stopTimer();
+            //$.APP.resetTimer();
+            //$.APP.pauseTimer();
+            
+        } else if(status == 'Parado') {
+            $.APP.pauseTimer();
+            
+        }
+        
+        $('.my-slider').unslider({
+            arrows: false,
+            animation: 'fade',
+            delay: 10000,
+            animateHeight: true,
+            autoplay: true 
+        });
+    }
+    </script>
+    
+   
+    
+    <apex:form id="form">
+        <apex:actionFunction name="updateTimeSeg" action="{!updateTimeSeg}"
+                             reRender="painelCenter, painelTorreA, painelTorreB" oncomplete="controleTime();" />
+        
+        <apex:panelGrid columns="1" styleClass="headerPainel" >
+            <apex:outputText styleClass="hp-titulo" 	value="{!torneioEvento.Torneio__r.Titulo__c}"/>
+            <apex:outputText styleClass="hp-subtitulo" value="{!torneioEvento.Name}"/>
+        </apex:panelGrid>
+        
+        <div class="torrePainel">
+            <apex:outputPanel id="painelTorreA">
+                <div class="timePainel timePainelLabel">
+                    <br/>
+                    <apex:outputText value="Jogadores"/>
+                    <br/>
+                    <apex:outputText value="{!torneioEvento.TotalPlayers__c} / "/>
+                    <apex:outputText value="{!torneioEvento.TotalBuyIn__c}"/>
+                    <br/><br/>
+                    <apex:outputText value="Rebuys"/>
+                    <br/>
+                    <apex:outputText value="{!torneioEvento.TotalRebuy__c}"/>
+                    <br/><br/>
+                    <apex:outputText value="Add Ons"/>
+                    <br/>
+                    <apex:outputText value="{!torneioEvento.TotalAddOn__c}"/>
+                    <br/><br/>
+                    <apex:outputText value="Time Chip"/>
+                    <br/>
+                    <apex:outputText value="{!torneioEvento.TotalTimeChip__c}"/>
+                    <br/><br/>
+                    <apex:outputText value="Op Staff"/>
+                    <br/>
+                    <apex:outputText value="0"/>
+                    <br/><br/>
+                </div>
+            </apex:outputPanel>
+        </div>
+        
+        <div class="torreCenter">
+            
+            <div class="timePainel">
+                <apex:outputPanel id="tempo" layout="inline">
+                    {!tempoString}
+                </apex:outputPanel>
+            </div>
+            
+            <apex:outputPanel id="painelCenter">
+                <div class="timePainel labelPainel {!IF(torneioNivel.ValorSmall__c == 0, 'timePainel-inter', '')}">
+                    <apex:outputPanel styleClass="spanNivel"><apex:outputText value="{!nivel}"/></apex:outputPanel>
+                </div>
+                
+                <div class="timePainel labelPainel" style="{!IF(torneioNivel.ValorSmall__c == 0, 'display: none;', '')}">
+                    <apex:outputPanel ><apex:outputText value="BLINDS"/></apex:outputPanel>
+                    <apex:outputPanel >
+                        
+                        <apex:outputText value="{0, number, #,###}">
+                            <apex:param value="{!torneioNivel.ValorSmall__c}" />
+                        </apex:outputText>
+                        <apex:outputText value=" / "/>
+                        
+                        <apex:outputText value="{0, number, ###,###,##0}">
+                            <apex:param value="{!torneioNivel.ValorBig__c}" />
+                        </apex:outputText>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!torneioNivel.ValorAnte__c != 0}" styleClass="spanNivel">
+                        <apex:outputText value="Ante: {!torneioNivel.ValorAnte__c}"/></apex:outputPanel>
+                </div>
+                
+                <div class="timePainel labelPainelProx" 
+                     style="{!IF(torneioNivelProx == null, 'display: none;', '')}">
+                    <apex:outputPanel rendered="{!torneioNivelProx.ValorSmall__c != 0}">
+                        <apex:outputText value="Próximos: "/>
+                        
+                        <apex:outputText value="{0, number, #,###}">
+                            <apex:param value="{!torneioNivelProx.ValorSmall__c}" />
+                        </apex:outputText>
+                        
+                        <apex:outputText value=" / "/>
+                        
+                        <apex:outputText value="{0, number, #,###}">
+                            <apex:param value="{!torneioNivelProx.ValorBig__c}" />
+                        </apex:outputText>
+                        
+                        <br/>
+                        <apex:outputPanel rendered="{!torneioNivelProx.ValorAnte__c != 0}">
+                            <apex:outputText value="Ante: {!torneioNivelProx.ValorAnte__c}"/></apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                </div>
+                <apex:inputHidden value="{!torneioEvento.Status__c}" id="statusEvento"/>
+                <input type="hidden" value="{!tempoLevel}" id="cd_seconds" />
+            </apex:outputPanel>
+            
+        </div>
+        
+        <div class="torrePainel">
+             <apex:outputPanel id="painelTorreB">
+            <div class="timePainel timePainelLabel">
+                
+                <div class="my-slider">
+                    <ul>
+                        <!--li>
+                            <br/>
+                            <apex:outputText value="Prêmiação"/>
+                            <br/>
+                            <br/>
+                            <apex:panelGrid columns="2" styleClass="gripPainelPremio" >
+                                
+                                <apex:outputText value="1º" styleClass="text-left" />
+                                <apex:outputText value="1.000.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="2º" styleClass="text-left" />
+                                <apex:outputText value="750.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="3º" styleClass="text-left" />
+                                <apex:outputText value="550.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="4º" styleClass="text-left" />
+                                <apex:outputText value="220.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="5º" styleClass="text-left" />
+                                <apex:outputText value="105.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="6º" styleClass="text-left" />
+                                <apex:outputText value="88.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="7º" styleClass="text-left" />
+                                <apex:outputText value="66.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="8º" styleClass="text-left" />
+                                <apex:outputText value="27.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="9º" styleClass="text-left" />
+                                <apex:outputText value="15.000,00" styleClass="text-right" />
+                                
+                                <apex:outputText value="10º" styleClass="text-left" />
+                                <apex:outputText value="8.000,00" styleClass="text-right" />
+                            </apex:panelGrid>                        
+                        </li-->
+                        <li>
+                            <br/>
+                            <apex:outputText value="Próximo Intervalo"/>
+                            <br/>
+                           <apex:outputText value="{!tempoIntervalo}"/>
+                            <br/><br/>
+                            <apex:outputText value="Média Stack"/>
+                            <br/>
+                            <apex:outputText value="{0, number, #,###}">
+                                <apex:param value="{!mediaStack}" />
+                            </apex:outputText>
+                            <br/><br/>
+                            <apex:outputText value="Chip Count"/>
+                            <br/>
+                            <apex:outputText value="{0, number, #,###}">
+                                <apex:param value="{!torneioEvento.TotalFichas__c}" />
+                            </apex:outputText>
+                            <br/><br/>
+                            
+                            <apex:outputText value="Total Pote"/>
+                            <br/>
+                            <apex:inputField value="{!torneioEvento.ValorArrecadado__c}" />
+                            <!--apex:outputText value="{0, number, #,###}">
+                                <apex:param value="{!torneioEvento.ValorArrecadado__c}" />
+                            </apex:outputText-->
+                            <br/><br/>
+                        </li>
+                    </ul>
+                </div>
+                 </div>
+            </apex:outputPanel>
+        </div>
+    </apex:form>
+    
+</apex:page>
