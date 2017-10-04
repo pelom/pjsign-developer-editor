@@ -4,7 +4,7 @@ global class ApexTestSuiteBatch implements Database.Batchable<sObject>, Schedula
 
 		for(ApexTestSuite suite : recordList) {
 			final Id testJobId = ApexTestSuiteService.getInstance().enqueueTests(suite);
-			ApexTestSuiteSchudulable.schedulable(new ApexTestSuiteSchudulable(suite, testJobId));
+			ApexTestSuiteSchedulable.schedulable(new ApexTestSuiteSchedulable(suite, testJobId));
 		}
 	}
 

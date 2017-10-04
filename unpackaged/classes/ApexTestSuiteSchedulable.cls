@@ -1,4 +1,4 @@
-global class ApexTestSuiteSchudulable implements Schedulable {
+global class ApexTestSuiteSchedulable implements Schedulable {
 
 	private static final String NAME = 'ApexTestSuiteSchudulable';
 	private static final Integer DELAY_SEGUNDS = 60;
@@ -7,10 +7,10 @@ global class ApexTestSuiteSchudulable implements Schedulable {
 	private Id testJobId;
 	private String nameTest;
 
-	private ApexTestSuiteSchudulable suiteSchudulable = this;
+	private ApexTestSuiteSchedulable suiteSchudulable = this;
 	private ApexTestSuiteService apexTestService;
 
-	public ApexTestSuiteSchudulable(ApexTestSuite apexTestSuite, Id testJobId) {
+	public ApexTestSuiteSchedulable(ApexTestSuite apexTestSuite, Id testJobId) {
 		this.nameTest = genarateKey(apexTestSuite);
 		this.apexTestSuite = apexTestSuite;
 		this.testJobId = testJobId;
@@ -53,7 +53,7 @@ global class ApexTestSuiteSchudulable implements Schedulable {
 		return !resultFail.isEmpty();
 	}
 
-	public static void schedulable(ApexTestSuiteSchudulable schedulableClass) {
+	public static void schedulable(ApexTestSuiteSchedulable schedulableClass) {
 		System.debug('ApexTestSuiteSchudulable.schedulable() schedulableClass: ' + schedulableClass);
 
 		abortSchedulable(schedulableClass);
@@ -61,7 +61,7 @@ global class ApexTestSuiteSchudulable implements Schedulable {
 		System.schedule(schedulableClass.nameTest, createCropDelay(DELAY_SEGUNDS), schedulableClass);
 	}
 
-	private static void abortSchedulable(ApexTestSuiteSchudulable schedulableClass) {
+	private static void abortSchedulable(ApexTestSuiteSchedulable schedulableClass) {
 		System.debug('ApexTestSuiteSchudulable.abortSchedulable() schedulableClass: ' + schedulableClass);
 
 		final List<CronTrigger> cronTriggerList = [
