@@ -53,6 +53,49 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ReadWrite</externalSharingModel>
+    <fields>
+        <fullName>NumberClassError__c</fullName>
+        <externalId>false</externalId>
+        <label>Number Class Error</label>
+        <summaryFilterItems>
+            <field>ApexClass__c.NumberError__c</field>
+            <operation>greaterThan</operation>
+            <value>0</value>
+        </summaryFilterItems>
+        <summaryForeignKey>ApexClass__c.Package__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackTrending>false</trackTrending>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>NumberClass__c</fullName>
+        <externalId>false</externalId>
+        <label>Number Class</label>
+        <summaryForeignKey>ApexClass__c.Package__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackTrending>false</trackTrending>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>NumberLinesCovegare__c</fullName>
+        <externalId>false</externalId>
+        <label>Number Lines Covegare</label>
+        <summarizedField>ApexClass__c.LinesCovegare__c</summarizedField>
+        <summaryForeignKey>ApexClass__c.Package__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <trackTrending>false</trackTrending>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>NumberLines__c</fullName>
+        <externalId>false</externalId>
+        <label>Number Lines</label>
+        <summarizedField>ApexClass__c.Lines__c</summarizedField>
+        <summaryForeignKey>ApexClass__c.Package__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <trackTrending>false</trackTrending>
+        <type>Summary</type>
+    </fields>
     <gender>Feminine</gender>
     <label>Package</label>
     <listViews>

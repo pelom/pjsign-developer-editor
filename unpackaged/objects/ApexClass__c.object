@@ -52,7 +52,7 @@
     <enableSearch>true</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
-    <externalSharingModel>ReadWrite</externalSharingModel>
+    <externalSharingModel>ControlledByParent</externalSharingModel>
     <fields>
         <fullName>ApexTest__c</fullName>
         <caseSensitive>false</caseSensitive>
@@ -165,15 +165,16 @@
     </fields>
     <fields>
         <fullName>Package__c</fullName>
-        <deleteConstraint>SetNull</deleteConstraint>
         <externalId>false</externalId>
         <label>Package</label>
         <referenceTo>Package__c</referenceTo>
         <relationshipLabel>Apex Classes</relationshipLabel>
         <relationshipName>Apex_Classes</relationshipName>
-        <required>false</required>
+        <relationshipOrder>0</relationshipOrder>
+        <reparentableMasterDetail>true</reparentableMasterDetail>
         <trackTrending>false</trackTrending>
-        <type>Lookup</type>
+        <type>MasterDetail</type>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
     </fields>
     <fields>
         <fullName>Trigger__c</fullName>
@@ -193,6 +194,7 @@
         <columns>NumberError__c</columns>
         <columns>LinesCovegare__c</columns>
         <columns>Lines__c</columns>
+        <columns>Coverage__c</columns>
         <filterScope>Everything</filterScope>
         <label>Tudo</label>
     </listViews>
@@ -207,6 +209,6 @@
         <customTabListAdditionalFields>LinesCovegare__c</customTabListAdditionalFields>
         <customTabListAdditionalFields>Lines__c</customTabListAdditionalFields>
     </searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

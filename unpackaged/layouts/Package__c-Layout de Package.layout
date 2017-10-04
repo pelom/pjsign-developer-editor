@@ -11,6 +11,22 @@
                 <behavior>Required</behavior>
                 <field>Name</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>NumberClass__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>NumberClassError__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>NumberLines__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>NumberLinesCovegare__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
@@ -51,11 +67,10 @@
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
-        <fields>Apex__c</fields>
-        <fields>ApexTest__c</fields>
-        <fields>DesignPattern__c</fields>
+        <fields>NumberError__c</fields>
         <fields>Lines__c</fields>
         <fields>LinesCovegare__c</fields>
+        <fields>Coverage__c</fields>
         <relatedList>ApexClass__c.Package__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
