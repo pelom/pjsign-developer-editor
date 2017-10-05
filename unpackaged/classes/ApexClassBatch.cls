@@ -9,7 +9,7 @@ public class ApexClassBatch extends AbstractService implements Database.Batchabl
 	}
 
 	public Void finish(Database.BatchableContext jobId) {
-		Database.executeBatch(new ApexTestPackageBatch());
+		//Database.executeBatch(new ApexTestPackageBatch());
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext jobId) {

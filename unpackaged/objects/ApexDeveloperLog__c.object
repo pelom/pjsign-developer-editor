@@ -52,78 +52,72 @@
     <enableSearch>true</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
-    <externalSharingModel>ReadWrite</externalSharingModel>
+    <externalSharingModel>ControlledByParent</externalSharingModel>
     <fields>
-        <fullName>Coverage__c</fullName>
+        <fullName>ApexClass__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
         <externalId>false</externalId>
-        <label>Coverage</label>
-        <precision>5</precision>
+        <label>Apex Class</label>
+        <referenceTo>ApexClass__c</referenceTo>
+        <relationshipLabel>Apex Developer Logs</relationshipLabel>
+        <relationshipName>Apex_Developer_Logs</relationshipName>
         <required>false</required>
-        <scale>2</scale>
         <trackTrending>false</trackTrending>
-        <type>Percent</type>
+        <type>Lookup</type>
     </fields>
     <fields>
-        <fullName>NumberClassError__c</fullName>
+        <fullName>ApexDeveloper__c</fullName>
         <externalId>false</externalId>
-        <label>Number Class Error</label>
-        <summaryFilterItems>
-            <field>ApexClass__c.NumberError__c</field>
-            <operation>greaterThan</operation>
-            <value>0</value>
-        </summaryFilterItems>
-        <summaryForeignKey>ApexClass__c.Package__c</summaryForeignKey>
-        <summaryOperation>count</summaryOperation>
+        <label>Apex Developer</label>
+        <referenceTo>ApexDeveloper__c</referenceTo>
+        <relationshipLabel>Apex Developer Logs</relationshipLabel>
+        <relationshipName>Apex_Developer_Logs</relationshipName>
+        <relationshipOrder>0</relationshipOrder>
+        <reparentableMasterDetail>false</reparentableMasterDetail>
         <trackTrending>false</trackTrending>
-        <type>Summary</type>
+        <type>MasterDetail</type>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
     </fields>
     <fields>
-        <fullName>NumberClass__c</fullName>
+        <fullName>Date__c</fullName>
         <externalId>false</externalId>
-        <label>Number Class</label>
-        <summaryForeignKey>ApexClass__c.Package__c</summaryForeignKey>
-        <summaryOperation>count</summaryOperation>
+        <label>Date</label>
+        <required>true</required>
         <trackTrending>false</trackTrending>
-        <type>Summary</type>
+        <type>DateTime</type>
     </fields>
     <fields>
-        <fullName>NumberLinesCoverage__c</fullName>
+        <fullName>Message__c</fullName>
         <externalId>false</externalId>
-        <label>Number Lines Coverage</label>
-        <summarizedField>ApexClass__c.LinesCovegare__c</summarizedField>
-        <summaryForeignKey>ApexClass__c.Package__c</summaryForeignKey>
-        <summaryOperation>sum</summaryOperation>
+        <label>Message</label>
+        <length>255</length>
+        <required>true</required>
         <trackTrending>false</trackTrending>
-        <type>Summary</type>
-    </fields>
-    <fields>
-        <fullName>NumberLines__c</fullName>
-        <externalId>false</externalId>
-        <label>Number Lines</label>
-        <summarizedField>ApexClass__c.Lines__c</summarizedField>
-        <summaryForeignKey>ApexClass__c.Package__c</summaryForeignKey>
-        <summaryOperation>sum</summaryOperation>
-        <trackTrending>false</trackTrending>
-        <type>Summary</type>
+        <type>Text</type>
+        <unique>false</unique>
     </fields>
     <gender>Feminine</gender>
-    <label>Package</label>
+    <label>Apex Developer Log</label>
     <listViews>
         <fullName>All</fullName>
+        <columns>NAME</columns>
+        <columns>ApexClass__c</columns>
+        <columns>Date__c</columns>
+        <columns>Message__c</columns>
         <filterScope>Everything</filterScope>
         <label>Tudo</label>
     </listViews>
     <nameField>
-        <label>Nome de Package</label>
+        <label>Nome de Apex Developer Log</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>Packages</pluralLabel>
+    <pluralLabel>Apex Developer Logs</pluralLabel>
     <searchLayouts>
-        <customTabListAdditionalFields>Coverage__c</customTabListAdditionalFields>
-        <customTabListAdditionalFields>NumberClass__c</customTabListAdditionalFields>
-        <customTabListAdditionalFields>NumberClassError__c</customTabListAdditionalFields>
-        <customTabListAdditionalFields>NumberLines__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>ApexDeveloper__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>ApexClass__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Message__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Date__c</customTabListAdditionalFields>
     </searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

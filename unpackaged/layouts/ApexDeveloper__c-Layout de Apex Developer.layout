@@ -11,31 +11,15 @@
                 <behavior>Required</behavior>
                 <field>Name</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>Coverage__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>NumberLinesCoverage__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>NumberLines__c</field>
-            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
+                <behavior>Required</behavior>
+                <field>ApexClass__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Edit</behavior>
-                <field>OwnerId</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>NumberClass__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>NumberClassError__c</field>
+                <field>User__c</field>
             </layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
@@ -71,11 +55,12 @@
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
-        <fields>NumberError__c</fields>
-        <fields>Coverage__c</fields>
-        <fields>Lines__c</fields>
-        <fields>LinesCovegare__c</fields>
-        <relatedList>ApexClass__c.Package__c</relatedList>
+        <fields>Date__c</fields>
+        <fields>Message__c</fields>
+        <fields>CREATEDBY_USER</fields>
+        <relatedList>ApexDeveloperLog__c.ApexDeveloper__c</relatedList>
+        <sortField>Date__c</sortField>
+        <sortOrder>Desc</sortOrder>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>
@@ -83,7 +68,7 @@
     <showRunAssignmentRulesCheckbox>false</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>
     <summaryLayout>
-        <masterLabel>00h61000003HcCP</masterLabel>
+        <masterLabel>00h61000003HcJB</masterLabel>
         <sizeX>4</sizeX>
         <sizeY>0</sizeY>
         <summaryLayoutStyle>Default</summaryLayoutStyle>

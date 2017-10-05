@@ -13,11 +13,37 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>Apex__c</field>
+                <field>Package__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>DesignPattern__c</field>
+                <field>Coverage__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>LinesCovegare__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Lines__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>NumberError__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>DateUpdate__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>DateCreated__c</field>
+            </layoutItems>
+        </layoutColumns>
+        <layoutColumns>
+            <layoutItems>
+                <behavior>Required</behavior>
+                <field>Apex__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -25,11 +51,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>Lines__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>LinesCovegare__c</field>
+                <field>DesignPattern__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -39,20 +61,7 @@
                 <behavior>Edit</behavior>
                 <field>Trigger__c</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Required</behavior>
-                <field>Package__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>NumberError__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>Coverage__c</field>
-            </layoutItems>
         </layoutColumns>
-        <layoutColumns/>
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>
     <layoutSections>
@@ -79,18 +88,37 @@
         <detailHeading>false</detailHeading>
         <editHeading>true</editHeading>
         <label>Links personalizados</label>
-        <layoutColumns/>
+        <layoutColumns>
+            <layoutItems>
+                <customLink>ApexClass</customLink>
+            </layoutItems>
+        </layoutColumns>
         <layoutColumns/>
         <layoutColumns/>
         <style>CustomLinks</style>
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
+        <fields>MethodName__c</fields>
         <fields>Outcome__c</fields>
         <fields>Message__c</fields>
-        <fields>MethodName__c</fields>
         <fields>StackTrace__c</fields>
         <relatedList>ApexClassMessage__c.ApexClass__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>NAME</fields>
+        <fields>CREATEDBY_USER</fields>
+        <fields>UPDATEDBY_USER</fields>
+        <relatedList>ApexDeveloper__c.ApexClass__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>NAME</fields>
+        <fields>Date__c</fields>
+        <fields>Message__c</fields>
+        <fields>CREATEDBY_USER</fields>
+        <relatedList>ApexDeveloperLog__c.ApexClass__c</relatedList>
+        <sortField>Date__c</sortField>
+        <sortOrder>Desc</sortOrder>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>

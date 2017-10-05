@@ -58,6 +58,25 @@ public class ApexTestPackageService extends  AbstractService {
 		];
 	}
 
+	public Package__c findApexTestPackage(String id) {
+		return [
+				SELECT Id, Name, NumberLinesCoverage__c, NumberLines__c,
+				CreatedDate, CreatedById, CreatedBy.Name,
+				LastModifiedDate, LastModifiedById, LastModifiedBy.Name
+				FROM Package__c WHERE Id =: id
+		];
+	}
+
+	public Map<Id, ApexClass__c> createApexIdApexClassMap(Package__c packag) {
+		final List<ApexClass__c> classList = findApexClass(packag);
+
+		final Map<Id, ApexClass__c> apexIdApexClassMap = new Map<Id, ApexClass__c>();
+		for(ApexClass__c classy : classList) {
+			apexIdApexClassMap.put(classy.Apex__c, classy);
+		}
+		return apexIdApexClassMap;
+	}
+
 	public List<ApexClass__c> findApexClass(Package__c packag) {
 		return [
 				SELECT Id, Name, Apex__c, ApexTest__c, LinesCovegare__c, Lines__c, Coverage__c
