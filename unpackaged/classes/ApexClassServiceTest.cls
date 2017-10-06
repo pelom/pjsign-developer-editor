@@ -11,12 +11,12 @@ private class ApexClassServiceTest {
 
 	@IsTest
 	static void testExecuteMap() {
-
+		System.assertEquals(true, false, 'Error test');
 	}
 
 	@IsTest
 	static void testCreateQuery() {
-		final String query = ApexClassService.createQuery();
+		final String query = ApexClassService.createQueryFull();
 		System.assertEquals(true, query != null);
 	}
 }

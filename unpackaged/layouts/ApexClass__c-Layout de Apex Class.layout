@@ -31,14 +31,6 @@
                 <behavior>Readonly</behavior>
                 <field>NumberError__c</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>DateUpdate__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>DateCreated__c</field>
-            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
@@ -47,7 +39,19 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
+                <field>DateCreated__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>DateUpdate__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
                 <field>ApexTest__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>ApexClassTest__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -102,8 +106,18 @@
         <fields>MethodName__c</fields>
         <fields>Outcome__c</fields>
         <fields>Message__c</fields>
-        <fields>StackTrace__c</fields>
+        <fields>CREATEDBY_USER</fields>
         <relatedList>ApexClassMessage__c.ApexClass__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>NAME</fields>
+        <fields>Package__c</fields>
+        <fields>NumberError__c</fields>
+        <fields>Coverage__c</fields>
+        <fields>Lines__c</fields>
+        <fields>DateCreated__c</fields>
+        <fields>DateUpdate__c</fields>
+        <relatedList>ApexClass__c.ApexClassTest__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>

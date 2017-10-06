@@ -54,6 +54,18 @@
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
     <fields>
+        <fullName>ApexClassTest__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <externalId>false</externalId>
+        <label>Apex Class Test</label>
+        <referenceTo>ApexClass__c</referenceTo>
+        <relationshipLabel>Apex Classes</relationshipLabel>
+        <relationshipName>Apex_Classes</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
         <fullName>ApexTest__c</fullName>
         <caseSensitive>false</caseSensitive>
         <externalId>true</externalId>
@@ -211,6 +223,7 @@
         <columns>LinesCovegare__c</columns>
         <columns>Lines__c</columns>
         <columns>Coverage__c</columns>
+        <columns>DateUpdate__c</columns>
         <filterScope>Everything</filterScope>
         <label>Tudo</label>
     </listViews>

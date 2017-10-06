@@ -24,30 +24,28 @@ public class ApexClassService extends  AbstractService {
 		for (ApexClass apexClass : apexClassList) {
 			apexClassMap.put(apexClass.Id, apexClass);
 		}
+
 		final Map<String, ApexClass> apexClassTestMap = createApexClassTestMap(apexClassMap);
-		final Map<String, ApexClass__c> classMap = createClassMap(apexClassMap);
+		final Map<String, ApexClass__c> classyUpdateMap = createClassMap(apexClassMap);
 		final Map<String, List<ApexDeveloper__c>> classDeveloperMap = createApexDeveloperMap(apexClassMap);
 
-		final List<ApexClass__c> newApexClassList = new List<ApexClass__c>();
+		final List<ApexClass__c> newClassList = new List<ApexClass__c>();
 		final List<ApexDeveloper__c> developerList = new List<ApexDeveloper__c>();
 		final List<ApexDeveloperLog__c> logList = new List<ApexDeveloperLog__c>();
 
 		for(ApexClass apexClass : apexClassList) {
-			ApexClass__c classy = classMap.get(apexClass.Id);
+			ApexClass__c classy = classyUpdateMap.get(apexClass.Id);
 
 			if(classy == null) {
 				classy = createClass(packageDefault, apexClass);
-				newApexClassList.add(classy);
+				newClassList.add(classy);
 			} else {
 				if(isUpdateClass(apexClass, classy)) {
-					final List<ApexDeveloper__c> devList =
-							classDeveloperMap.get(String.valueOf(apexClass.Id));
+					final List<ApexDeveloper__c> devList = classDeveloperMap.get(String.valueOf(apexClass.Id));
 
 					final List<ApexDeveloper__c> exist = new List<ApexDeveloper__c>();
 					for(ApexDeveloper__c dev : devList) {
 						if(dev.User__c == apexClass.LastModifiedById) {
-							System.debug('update: ' + dev);
-
 							ApexDeveloperLog__c log = developerService.createApexDeveloperLog(dev, classy, apexClass);
 							logList.add(log);
 
@@ -64,47 +62,25 @@ public class ApexClassService extends  AbstractService {
 				}
 			}
 
-			final ApexClass apexClassTest = apexClassTestMap.get(apexClass.Name + 'Test');
-			if(apexClassTest != null) {
-				classy.ApexTest__c = apexClassTest.Id;
-			}
+			lookingApexClass(classy, apexClass, apexClassTestMap, classyUpdateMap);
 
-			classMap.put(String.valueOf(apexClass.Id), classy);
+			classyUpdateMap.put(String.valueOf(apexClass.Id), classy);
 		}
 
 		try {
-			Database.UpsertResult[] result = Database.upsert(classMap.values());
-//			final List<ApexClass__c> newClassList = new List<ApexClass__c>();
-//			for(Database.UpsertResult res : result) {
-//				if(res.isCreated()) {
-//					newClassList.add();
-//				}
-//			}
+			Database.UpsertResult[] result = Database.upsert(classyUpdateMap.values());
 
-			for(ApexClass__c classy : newApexClassList) {
+			for(ApexClass__c classy : newClassList) {
 				final ApexClass apexClass = apexClassMap.get(classy.Apex__c);
 				developerList.add(developerService.createApexDeveloper(classy, apexClass));
 			}
 
 			if(!developerList.isEmpty()) {
 				result = Database.upsert(developerList);
-				final List<Id> isList = new List<Id>();
-				for(Database.UpsertResult res : result) {
-					if(res.isCreated()) {
-						isList.add(res.getId());
-					}
-				}
-				final List<ApexDeveloper__c> devList = [
-						SELECT Id, Name, ApexClass__r.Apex__c FROM ApexDeveloper__c WHERE Id IN: isList];
 
-				for(ApexDeveloper__c dev : devList) {
-					final ApexClass apexClass = apexClassMap.get(dev.ApexClass__r.Apex__c);
-					final ApexClass__c classy = classMap.get(dev.ApexClass__r.Apex__c);
-					ApexDeveloperLog__c log = developerService.createApexDeveloperLog(dev, classy, apexClass);
-					log.Date__c = apexClass.CreatedDate;
-					log.Message__c = 'Criou ';
-					logList.add(log);
-				}
+				final Set<Id> idSet = createaList(result);
+				List<ApexDeveloperLog__c> lList = createLogList(idSet, apexClassMap, classyUpdateMap);
+				logList.addAll(lList);
 			}
 
 			if(!logList.isEmpty()) {
@@ -227,12 +203,58 @@ public class ApexClassService extends  AbstractService {
 		return null;
 	}
 
-	public static String createQuery() {
+	private void lookingApexClass(ApexClass__c classy, ApexClass apexClass,
+								  Map<String, ApexClass> apexClassTestMap,
+								  Map<String, ApexClass__c> classMap) {
+
+		final ApexClass apexClassTest = apexClassTestMap.get(buildNameTest(apexClass));
+		if(apexClassTest != null) {
+			classy.ApexTest__c = apexClassTest.Id;
+
+			final ApexClass__c classText = classMap.get(String.valueOf(apexClassTest.Id));
+			if(classText != null) {
+				classy.ApexClassTest__c = classText.Id;
+			}
+		}
+	}
+
+	private List<ApexDeveloperLog__c> createLogList(Set<Id> idSet,
+			Map<String, ApexClass> apexClassMap, Map<String, ApexClass__c> classyUpdateMap) {
+		final List<ApexDeveloperLog__c> logList = new List<ApexDeveloperLog__c>();
+
+		final List<ApexDeveloper__c> devList = [
+				SELECT Id, Name, ApexClass__r.Apex__c FROM ApexDeveloper__c WHERE Id IN: idSet];
+
+		for(ApexDeveloper__c dev : devList) {
+			final ApexClass apexClass = apexClassMap.get(dev.ApexClass__r.Apex__c);
+			final ApexClass__c classy = classyUpdateMap.get(dev.ApexClass__r.Apex__c);
+
+			ApexDeveloperLog__c log = developerService.createApexDeveloperLog(dev, classy, apexClass);
+			log.Date__c = apexClass.CreatedDate;
+			log.Message__c = 'Criou ';
+
+			logList.add(log);
+		}
+
+		return logList;
+	}
+
+	public static String createQueryFull() {
 		return 'SELECT Id, Name, '
 				+ ' CreatedDate, CreatedById, CreatedBy.Name,'
 				+ ' LastModifiedDate, LastModifiedById, LastModifiedBy.Name'
 				+ ' FROM ApexClass '
-				+ ' ORDER BY CreatedDate DESC '
+				+ ' ORDER BY Name ASC '
+		;
+	}
+
+	public static String createQuery(String data) {
+		return 'SELECT Id, Name, '
+				+ ' CreatedDate, CreatedById, CreatedBy.Name,'
+				+ ' LastModifiedDate, LastModifiedById, LastModifiedBy.Name'
+				+ ' FROM ApexClass '
+				+ ' WHERE LastModifiedDate > ' + data
+				+ ' ORDER BY LastModifiedDate DESC '
 		;
 	}
 }

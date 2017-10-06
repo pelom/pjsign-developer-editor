@@ -98,7 +98,7 @@ public class ApexTestPackageService extends  AbstractService {
 				+ ' CreatedDate, CreatedById, CreatedBy.Name,'
 				+ ' LastModifiedDate, LastModifiedById, LastModifiedBy.Name'
 				+ ' FROM Package__c '
-				//+ ' WHERE IsDeleted = false '
+				+ ' WHERE RunTest__c = true '
 				+ ' ORDER BY CreatedDate ASC '
 		;
 	}

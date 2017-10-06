@@ -1,20 +1,37 @@
-public class ApexClassBatch extends AbstractService implements Database.Batchable<sObject>, Schedulable {
+public class ApexClassBatch extends AbstractServiceSchedulable {
 
-	public Void execute(System.SchedulableContext context) {
+	private final Boolean full;
+
+	public ApexClassBatch(Boolean full) {
+		super(ONLY_RUN);
+
+		this.full = full;
 	}
 
-	public Void execute(Database.BatchableContext jobId, List<sObject> recordList) {
+	public ApexClassBatch(Integer minutes) {
+		super(minutes);
+		this.full = false;
+	}
+
+	public void execute(Database.BatchableContext jobId, List<sObject> recordList) {
 		System.debug(getClass() + '.execute() jobId: ' + jobId);
 		ApexClassService.getInstance().executeMap(recordList);
 	}
 
-	public Void finish(Database.BatchableContext jobId) {
-		//Database.executeBatch(new ApexTestPackageBatch());
-	}
-
 	public Database.QueryLocator start(Database.BatchableContext jobId) {
 		System.debug(getClass() + '.start() jobId: ' + jobId);
-		final String query = ApexClassService.createQuery();
+
+		final Datetime dta = Datetime.now().addMinutes(-this.minutes);
+
+		String query = null;
+		if(this.full) {
+			query = ApexClassService.createQueryFull();
+		} else {
+			query = ApexClassService.createQuery(
+							dta.formatGMT('yyyy-MM-dd') + 'T'
+							   + dta.formatGMT('HH:mm:ss.SSS') + 'Z');
+		}
+
 		System.debug(getClass() + '.start() query: ' + query);
 		return Database.getQueryLocator(query);
 	}

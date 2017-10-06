@@ -64,6 +64,14 @@
         <type>Percent</type>
     </fields>
     <fields>
+        <fullName>DateLastRunTest__c</fullName>
+        <externalId>false</externalId>
+        <label>Date Last Run Test</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
         <fullName>NumberClassError__c</fullName>
         <externalId>false</externalId>
         <label>Number Class Error</label>
@@ -105,6 +113,14 @@
         <summaryOperation>sum</summaryOperation>
         <trackTrending>false</trackTrending>
         <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>RunTest__c</fullName>
+        <defaultValue>true</defaultValue>
+        <externalId>false</externalId>
+        <label>Run Test</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
     </fields>
     <gender>Feminine</gender>
     <label>Package</label>

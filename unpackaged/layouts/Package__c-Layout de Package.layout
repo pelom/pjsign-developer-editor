@@ -37,6 +37,14 @@
                 <behavior>Readonly</behavior>
                 <field>NumberClassError__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>DateLastRunTest__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>RunTest__c</field>
+            </layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>
@@ -71,6 +79,7 @@
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
+        <fields>ApexClassTest__c</fields>
         <fields>NumberError__c</fields>
         <fields>Coverage__c</fields>
         <fields>Lines__c</fields>
