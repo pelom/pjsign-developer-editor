@@ -108,6 +108,11 @@
     <label>Apex Class Message</label>
     <listViews>
         <fullName>All</fullName>
+        <columns>NAME</columns>
+        <columns>ApexClass__c</columns>
+        <columns>MethodName__c</columns>
+        <columns>Message__c</columns>
+        <columns>CREATEDBY_USER</columns>
         <filterScope>Everything</filterScope>
         <label>Tudo</label>
     </listViews>

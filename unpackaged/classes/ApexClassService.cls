@@ -92,7 +92,7 @@ public class ApexClassService extends  AbstractService {
 		}
 	}
 
-	private Package__c getPackageDefault() {
+	public Package__c getPackageDefault() {
 		final List<Package__c> packageDefault =
 			[ SELECT Id FROM Package__c WHERE Name =: PACKAGE_DEFAULT ];
 
@@ -170,7 +170,7 @@ public class ApexClassService extends  AbstractService {
 		return apexClass.LastModifiedDate != classy.DateUpdate__c;
 	}
 
-	private ApexClass__c createClass(Package__c packag, ApexClass apexClass) {
+	public ApexClass__c createClass(Package__c packag, ApexClass apexClass) {
 		final ApexClass__c classy = new ApexClass__c();
 		classy.Apex__c = apexClass.Id;
 		classy.Package__c = packag.Id;
@@ -206,7 +206,6 @@ public class ApexClassService extends  AbstractService {
 	private void lookingApexClass(ApexClass__c classy, ApexClass apexClass,
 								  Map<String, ApexClass> apexClassTestMap,
 								  Map<String, ApexClass__c> classMap) {
-
 		final ApexClass apexClassTest = apexClassTestMap.get(buildNameTest(apexClass));
 		if(apexClassTest != null) {
 			classy.ApexTest__c = apexClassTest.Id;
