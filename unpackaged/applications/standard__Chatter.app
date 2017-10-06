@@ -7,4 +7,5 @@
     <tab>standard-OtherUserProfile</tab>
     <tab>standard-CollaborationGroup</tab>
     <tab>standard-File</tab>
+    <tab>ApexClass__c</tab>
 </CustomApplication>

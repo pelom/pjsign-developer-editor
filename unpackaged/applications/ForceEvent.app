@@ -10,4 +10,5 @@
     <tab>Inscricao</tab>
     <tab>TorneioNivel__c</tab>
     <tab>TorneioEvento__c</tab>
+    <tab>ApexClass__c</tab>
 </CustomApplication>

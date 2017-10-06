@@ -12,4 +12,5 @@
     <tab>DealerMesa__c</tab>
     <tab>SessaoCash__c</tab>
     <tab>DealerSessao__c</tab>
+    <tab>ApexClass__c</tab>
 </CustomApplication>

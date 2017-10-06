@@ -10,4 +10,5 @@
     <tab>standard-report</tab>
     <tab>standard-Dashboard</tab>
     <tab>standard-Quote</tab>
+    <tab>ApexClass__c</tab>
 </CustomApplication>

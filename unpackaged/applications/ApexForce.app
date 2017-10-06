@@ -4,4 +4,7 @@
     <label>ApexForce</label>
     <tab>ApexClass__c</tab>
     <tab>Package__c</tab>
+    <tab>ApexDeveloper__c</tab>
+    <tab>ApexDeveloperLog__c</tab>
+    <tab>ApexClassMessage__c</tab>
 </CustomApplication>

@@ -4,4 +4,5 @@
     <formFactors>Large</formFactors>
     <tab>standard-Chatter</tab>
     <tab>standard-Sites</tab>
+    <tab>ApexClass__c</tab>
 </CustomApplication>

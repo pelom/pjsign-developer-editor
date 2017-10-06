@@ -26,5 +26,6 @@
     <tab>standard-News</tab>
     <tab>standard-Forecasting3</tab>
     <tab>standard-EinsteinAnalytics</tab>
+    <tab>ApexClass__c</tab>
     <uiType>Lightning</uiType>
 </CustomApplication>

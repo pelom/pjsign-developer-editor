@@ -4,4 +4,5 @@
     <formFactors>Large</formFactors>
     <tab>standard-AppLauncher</tab>
     <tab>standard-Quote</tab>
+    <tab>ApexClass__c</tab>
 </CustomApplication>

@@ -1,9 +1,9 @@
 ({
-    helperMethod : function() {
+	helperMethod : function() {
+		
+	},
 
-    },
-
-    svgRender: function(component, svgId) {
+	 svgRender: function(component, svgId) {
         console.log('svgRender() component: ', component, 'sgvId: ', svgId);
         var svg = component.find(svgId);
         var value = svg.getElement().innerText;
