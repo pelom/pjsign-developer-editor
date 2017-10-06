@@ -5,15 +5,8 @@ global class ApexTestCoverageBatch extends AbstractService implements Database.B
 		this.id	 = id;
 	}
 
-	public Void execute(Database.BatchableContext jobId, List<Package__c> recordList) {
+	public void execute(Database.BatchableContext jobId, List<Package__c> recordList) {
 		final Package__c packag = recordList.get(0);
-//		final List<ApexClass__c> classList = ApexTestPackageService.getInstance().findApexClass(recordList.get(0));
-//
-//		final Set<Id> classIdSet = new Set<Id>();
-//		for(ApexClass__c classy : classList) {
-//			System.debug(getClass() + '.onTestCompleted() res: ' + classy);
-//			classIdSet.add(classy.Apex__c);
-//		}
 
 		final Map<Id, ApexClass__c> apexIdApexClass =
 				ApexTestPackageService.getInstance().createApexIdApexClassMap(packag);
@@ -58,9 +51,9 @@ global class ApexTestCoverageBatch extends AbstractService implements Database.B
 
 	private ApexClassMessage__c createMessage(ApexClass__c apexClass) {
 		final ApexClassMessage__c apexMessage = new ApexClassMessage__c();
-		apexMessage.Name = 'Covegare Low';
+		apexMessage.Name = 'Covegare Class Low';
 		apexMessage.ApexClass__c = apexClass.Id;
-		apexMessage.Outcome__c = 'warn';
+		apexMessage.Outcome__c = 'Fail';
 		return apexMessage;
 	}
 

@@ -10,9 +10,8 @@ public with sharing class ApexTestRunPackageSchedulable extends ApexTestRunSched
 	public override void onTestCompleted(ApexTestResult[] results) {
 		System.debug(getClass() + '.onTestCompleted() results: ' + results.size());
 
-		//Database.executeBatch(new ApexTestCoverageBatch(packag.Id));
-
-		final List<ApexClass__c> classList = ApexTestPackageService.getInstance().findApexClass(packag);
+		final List<ApexClass__c> classList =
+				ApexTestPackageService.getInstance().findApexClass(getPackag());
 
 		final Map<String, ApexClass__c> apexClassMap = new Map<String, ApexClass__c>();
 		Set<Id> deleteMessage = new Set<Id>();
@@ -38,6 +37,8 @@ public with sharing class ApexTestRunPackageSchedulable extends ApexTestRunSched
 		}
 
 		Database.insert(newMessageList);
+
+		Database.executeBatch(new ApexTestCoverageBatch(packag.Id));
 	}
 
 	private ApexClassMessage__c createMessage(ApexClass__c classsy, ApexTestResult apexTest) {
